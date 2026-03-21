@@ -46,7 +46,11 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       const err = await res.text();
       console.error("HubSpot API error:", res.status, err);
-      return NextResponse.json({ ok: false, error: "hubspot_error" }, { status: 500 });
+      // Return HubSpot's error detail so we can debug from the browser
+      return NextResponse.json(
+        { ok: false, error: "hubspot_error", detail: err, status: res.status },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ ok: true });

@@ -56,7 +56,11 @@ export default function CTAForm() {
         body: JSON.stringify(data),
       });
 
-      if (!res.ok) throw new Error("server error");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Form submission error:", errData);
+        throw new Error(errData?.detail ?? "server error");
+      }
 
       // Fire GA4 event
       if (typeof window !== "undefined" && window.dataLayer) {

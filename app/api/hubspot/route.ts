@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   const fields = [
     { name: "firstname", value: body.firstname ?? "" },
-    { name: "company", value: body.company ?? "" },
+    { name: "0-2/name", value: body.company ?? "" },
     { name: "jobtitle", value: body.jobtitle ?? "" },
     { name: "email", value: body.email ?? "" },
     { name: "phone", value: body.phone ?? "" },

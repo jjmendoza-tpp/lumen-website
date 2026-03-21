@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SocialProof from "@/components/SocialProof";
@@ -10,10 +11,20 @@ import Pricing from "@/components/Pricing";
 import CTAForm from "@/components/CTAForm";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Lumen — AI-powered omnichannel customer service platform",
+  description:
+    "Lumen connects WhatsApp, voice, email and social media into an intelligent inbox that responds, queries your systems and escalates to the right human — in seconds.",
+  alternates: {
+    canonical: "https://ailumen.app/en",
+    languages: { es: "https://ailumen.app" },
+  },
+};
+
+export default function HomeEN() {
   return (
     <>
-      <Navbar lang="es" />
+      <Navbar lang="en" />
       <Hero />
       <SocialProof />
       <DemoInteractiva />

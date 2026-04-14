@@ -35,11 +35,13 @@ export default function Navbar({ lang = "es" }: { lang?: "es" | "en" }) {
         <div className="max-w-[1400px] mx-auto px-6 h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" aria-label="Lumen — Ir al inicio">
-            <div className="w-[160px] h-[36px] bg-white/[0.06] border border-white/[0.08] rounded-lg flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-              <span className="text-[10px] tracking-[0.18em] uppercase text-[#7E8FA6] font-medium">
-                LOGO LUMEN
-              </span>
-            </div>
+            <img
+              src="/logos/lumen-logo-white.png"
+              alt="Lumen"
+              width={140}
+              height={36}
+              className="h-9 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop nav links */}
@@ -102,11 +104,13 @@ export default function Navbar({ lang = "es" }: { lang?: "es" | "en" }) {
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] bg-black flex flex-col">
           <div className="flex items-center justify-between px-6 h-16 border-b border-white/[0.06]">
-            <div className="w-[140px] h-[32px] bg-white/[0.06] border border-white/[0.08] rounded-lg flex items-center justify-center">
-              <span className="text-[9px] tracking-[0.18em] uppercase text-[#7E8FA6]">
-                LOGO LUMEN
-              </span>
-            </div>
+            <img
+              src="/logos/lumen-logo-white.png"
+              alt="Lumen"
+              width={120}
+              height={32}
+              className="h-8 w-auto object-contain"
+            />
             <button
               onClick={() => setMobileOpen(false)}
               className="text-white/70 hover:text-white transition-colors p-1"

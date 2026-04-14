@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   description:
     "Lumen connects WhatsApp, voice, email and social media into an intelligent inbox that responds, queries your systems and escalates to the right human — in seconds.",
   alternates: {
-    canonical: "https://ailumen.app/en",
-    languages: { es: "https://ailumen.app" },
+    canonical: "https://lumenapp.ai/en",
+    languages: { es: "https://lumenapp.ai" },
   },
 };
 

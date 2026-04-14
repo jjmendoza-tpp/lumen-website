@@ -49,22 +49,47 @@ export default function CTAForm() {
 
     setFormState("loading");
 
+    const PORTAL_ID = "50799369";
+    const FORM_ID = "04f6e5eb-168f-4d09-a034-749551ffb9ac";
+
+    const hsFields = [
+      { name: "firstname", value: String(data.firstname ?? "") },
+      { name: "0-2/name", value: String(data.company ?? "") },
+      { name: "jobtitle", value: String(data.jobtitle ?? "") },
+      { name: "email", value: String(data.email ?? "") },
+      { name: "phone", value: String(data.phone ?? "") },
+      { name: "message", value: String(data.message ?? "") },
+    ].filter((f) => f.value.trim() !== "");
+
     try {
-      const res = await fetch("/api/hubspot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_ID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fields: hsFields,
+            context: {
+              pageUri: window.location.href,
+              pageName: "Lumen Website — Solicitud Demo",
+            },
+          }),
+        }
+      );
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        console.error("Form submission error:", errData);
-        throw new Error(errData?.detail ?? "server error");
+        const err = await res.text();
+        console.error("HubSpot error:", res.status, err);
+        throw new Error("hubspot_error");
       }
 
-      // Fire GA4 event
+      // Fire GA4 / GTM event
       if (typeof window !== "undefined" && window.dataLayer) {
-        window.dataLayer.push({ event: "lead_form_submit" });
+        window.dataLayer.push({
+          event: "lead_form_submit",
+          form_name: "lumen_demo_request",
+          form_source: "lumenapp.ai",
+        });
       }
 
       setFormState("success");

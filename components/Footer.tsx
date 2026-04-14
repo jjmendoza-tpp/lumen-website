@@ -16,11 +16,13 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {/* Col 1 — Brand */}
             <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
-              <div className="w-[140px] h-[32px] bg-white/[0.06] border border-white/[0.08] rounded-lg flex items-center justify-center">
-                <span className="text-[9px] tracking-[0.18em] uppercase text-[#7E8FA6]">
-                  LOGO LUMEN
-                </span>
-              </div>
+              <img
+                src="/logos/lumen-logo-white.png"
+                alt="Lumen"
+                width={120}
+                height={32}
+                className="h-8 w-auto object-contain"
+              />
               <p className="text-sm text-[#7E8FA6] leading-relaxed max-w-[22ch]">
                 La claridad en movimiento.
               </p>

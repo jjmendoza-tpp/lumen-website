@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lumen Landing
 
-## Getting Started
+Landing page productiva de Lumen publicada en `https://lumenapp.ai`.
 
-First, run the development server:
+## Estado actual
+
+- Producción activa en Netlify.
+- Dominio principal: `https://lumenapp.ai`
+- Alias: `https://www.lumenapp.ai`
+- Certificado TLS activo para ambos hosts.
+- Sitio 100% estático en publicación, generado con Next.js App Router y `output: "export"`.
+
+## Objetivo del proyecto
+
+Servir una landing de adquisición fiel al Figma de Lumen, con:
+
+- tracking de marketing activo
+- formulario HubSpot funcional
+- SEO técnico base listo para campañas y discovery
+- opción de modo oscuro, pero carga inicial en modo claro
+
+## Stack
+
+- Next.js 16
+- React 19
+- TypeScript
+- Export estático de Next.js
+- Netlify como hosting productivo
+
+## Producción
+
+- Site ID Netlify: `d2bcf403-da7f-4785-8098-7b30435648c2`
+- Proyecto Netlify: `lumenapp-ai`
+- Dominio productivo: `lumenapp.ai`
+- Repo Git conectado por el usuario en Netlify como respaldo operativo:
+  - `https://github.com/jjmendoza-tpp/lumenapp-ai`
+
+Nota operativa:
+
+- Este workspace local todavía puede conservar referencias históricas a otro remoto Git. Antes de empujar cambios, verificar que el repo local y el repo conectado en Netlify sean el mismo destino esperado.
+
+## Tracking y formularios
+
+- GTM: `GTM-KZNM7JNM`
+- GA4: `G-BWZW45MGRG`
+- LinkedIn Insight: `9006578`
+- HubSpot portal: `50799369`
+- HubSpot form: `04f6e5eb-168f-4d09-a034-749551ffb9ac`
+
+## SEO técnico configurado
+
+- `Lumen AI` como título del home
+- descripción principal en español en `/`
+- metadata en inglés en `/en`
+- `/en` en `noindex`
+- `canonical` único a `https://lumenapp.ai`
+- `robots.txt` activo
+- `sitemap.xml` con solo la raíz canónica
+- favicon, apple touch icon y app icons
+- `site.webmanifest` con MIME correcto
+- JSON-LD base de `Organization` y `WebSite`
+
+## Tema visual
+
+- La primera visita entra en modo claro.
+- Si el usuario cambia a oscuro o vuelve a claro, la preferencia se guarda en `localStorage` con la clave `lumen-theme`.
+
+## Comandos útiles
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+python3 -m http.server 4321 -d out
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estructura documental
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `docs/brief.md`: brief del producto y alcance
+- `docs/decisions.md`: decisiones técnicas y de producto
+- `docs/experiments.md`: evidencia y validaciones
+- `tasks/todo.md`: plan ejecutado y checklist
+- `tasks/lessons.md`: aprendizajes preventivos
+- `docs/operations.md`: guía operativa de producción
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Criterio de release
 
-## Learn More
+Antes de considerar un cambio listo:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run build` debe pasar
+- la home debe responder en `https://lumenapp.ai`
+- el formulario HubSpot debe renderizar
+- el título y metadata del home deben seguir siendo canónicos
+- favicon, manifest y sitemap deben responder con `200`
+- el sitio debe cargar en modo claro para visitante nuevo

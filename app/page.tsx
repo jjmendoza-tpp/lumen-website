@@ -1,29 +1,22 @@
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import SocialProof from "@/components/SocialProof";
-import DemoInteractiva from "@/components/DemoInteractiva";
-import PainLayer from "@/components/PainLayer";
-import ComoFunciona from "@/components/ComoFunciona";
-import Capacidades from "@/components/Capacidades";
-import Canales from "@/components/Canales";
-import Pricing from "@/components/Pricing";
-import CTAForm from "@/components/CTAForm";
-import Footer from "@/components/Footer";
+import type { Metadata } from "next";
+import LumenLanding from "@/components/landing/LumenLanding";
+
+export const metadata: Metadata = {
+  description:
+    "Lumen AI ayuda a equipos de marketing, ventas y CX a responder por WhatsApp, voz, email y redes sociales desde una sola operación conversacional.",
+  alternates: {
+    canonical: "https://lumenapp.ai",
+  },
+  openGraph: {
+    title: "Lumen AI",
+    description:
+      "Lumen AI ayuda a equipos de marketing, ventas y CX a responder por WhatsApp, voz, email y redes sociales desde una sola operación conversacional.",
+    url: "https://lumenapp.ai",
+    locale: "es_GT",
+    type: "website",
+  },
+};
 
 export default function Home() {
-  return (
-    <>
-      <Navbar lang="es" />
-      <Hero />
-      <SocialProof />
-      <DemoInteractiva />
-      <PainLayer />
-      <ComoFunciona />
-      <Capacidades />
-      <Canales />
-      <Pricing />
-      <CTAForm />
-      <Footer />
-    </>
-  );
+  return <LumenLanding />;
 }

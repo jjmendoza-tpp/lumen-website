@@ -1,40 +1,36 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import SocialProof from "@/components/SocialProof";
-import DemoInteractiva from "@/components/DemoInteractiva";
-import PainLayer from "@/components/PainLayer";
-import ComoFunciona from "@/components/ComoFunciona";
-import Capacidades from "@/components/Capacidades";
-import Canales from "@/components/Canales";
-import Pricing from "@/components/Pricing";
-import CTAForm from "@/components/CTAForm";
-import Footer from "@/components/Footer";
+import LumenLanding from "@/components/landing/LumenLanding";
 
 export const metadata: Metadata = {
-  title: "Lumen — AI-powered omnichannel customer service platform",
+  title: "Omnichannel AI platform for customer service",
   description:
-    "Lumen connects WhatsApp, voice, email and social media into an intelligent inbox that responds, queries your systems and escalates to the right human — in seconds.",
+    "Lumen AI helps marketing, sales and CX teams respond across WhatsApp, voice, email and social channels from a single conversational operation.",
   alternates: {
-    canonical: "https://lumenapp.ai/en",
-    languages: { es: "https://lumenapp.ai" },
+    canonical: "https://lumenapp.ai",
+  },
+  robots: {
+    index: false,
+    follow: true,
+    googleBot: {
+      index: false,
+      follow: true,
+    },
+  },
+  openGraph: {
+    title: "Lumen AI",
+    description:
+      "Lumen AI helps marketing, sales and CX teams respond across WhatsApp, voice, email and social channels from a single conversational operation.",
+    url: "https://lumenapp.ai",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    title: "Lumen AI",
+    description:
+      "Lumen AI helps marketing, sales and CX teams respond across WhatsApp, voice, email and social channels from a single conversational operation.",
   },
 };
 
 export default function HomeEN() {
-  return (
-    <>
-      <Navbar lang="en" />
-      <Hero />
-      <SocialProof />
-      <DemoInteractiva />
-      <PainLayer />
-      <ComoFunciona />
-      <Capacidades />
-      <Canales />
-      <Pricing />
-      <CTAForm />
-      <Footer />
-    </>
-  );
+  return <LumenLanding />;
 }

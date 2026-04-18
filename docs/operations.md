@@ -1,7 +1,9 @@
 # Operación de Producción
 
 Fecha de consolidación: 2026-04-14
+Última actualización: 2026-04-18 (auditoría + hardening de seguridad)
 Proyecto: Lumen Landing
+Baseline auditado: tag `v1.0.0-verified-2026-04-18`
 
 ## Estado operativo
 
@@ -18,16 +20,23 @@ Proyecto: Lumen Landing
 - Design system de apoyo: LUMEN-DESIGN
 - Código productivo: este proyecto
 - Repo conectado en Netlify por el usuario:
-  - `https://github.com/jjmendoza-tpp/lumenapp-ai`
+  - `https://github.com/jjmendoza-tpp/lumen-website`
 
-## Flujo de publicación recomendado
+## Flujo de publicación (auto-deploy activo)
 
-1. Hacer cambios en este proyecto.
-2. Ejecutar `npm run build`.
-3. Verificar localmente el export en `out/`.
-4. Confirmar que metadata, formulario y tema no hayan regresado.
-5. Publicar vía Netlify o por el flujo Git conectado al repo productivo.
-6. Validar `https://lumenapp.ai` con smoke test real.
+1. Crear branch desde `main` actualizado.
+2. Cambios locales. Validar con `npm run build` y `npm audit`.
+3. Push de la branch, abrir PR contra `main` (obligatorio — branch protegida).
+4. Squash-merge con linear history.
+5. Netlify detecta el push vía webhook (`https://api.netlify.com/hooks/github`, hook GitHub id `606928044`, deploy key id `148948558`) y compila en ~15–30s.
+6. Smoke test contra `https://lumenapp.ai`.
+
+Deploy manual de emergencia (bypass Git, solo si auto-deploy falla):
+
+```bash
+NETLIFY_AUTH_TOKEN=<token> npx netlify-cli deploy --prod \
+  --dir=out --site=d2bcf403-da7f-4785-8098-7b30435648c2
+```
 
 ## Smoke test mínimo post-deploy
 
@@ -53,8 +62,39 @@ Proyecto: Lumen Landing
 - LinkedIn Insight: `9006578`
 - HubSpot portal: `50799369`
 - HubSpot form: `04f6e5eb-168f-4d09-a034-749551ffb9ac`
-- Chat widget base URL: `https://app.innovacion.ai`
-- Chat widget website token: `66KFTkHdoCo8eNDNRMBGisct`
+- Chat widget base URL: `https://app.innovacion.ai` (env `NEXT_PUBLIC_CHATWOOT_BASE_URL`)
+- Chat widget website token: `66KFTkHdoCo8eNDNRMBGisct` (env `NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN`)
+
+Env vars viven en Netlify (Site configuration → Environment variables), contexts `all`, scopes `builds` + `runtime`. Si la env var no existe, `app/layout.tsx` usa fallback hardcodeado.
+
+## Seguridad operativa
+
+Headers en `public/_headers` (verificables con `curl -sI https://lumenapp.ai/`):
+
+- `Content-Security-Policy` allowlist: GTM, GA4, LinkedIn, HubSpot, Chatwoot.
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`.
+- `X-Frame-Options: DENY` + `frame-ancestors 'none'`.
+- `X-Content-Type-Options: nosniff`.
+- `Referrer-Policy: strict-origin-when-cross-origin`.
+- `Permissions-Policy` denegando camera/mic/geo/payment/usb/sensores/FLoC.
+- `Cross-Origin-Opener-Policy: same-origin`.
+- `form-action` restringido a self + endpoints HubSpot.
+
+GitHub:
+
+- Branch protection en `main`: PRs obligatorios, linear history, force push/deletions bloqueados, `enforce_admins: true`.
+- Secret scanning + push protection activos.
+- Dependabot alerts + automated security fixes activos.
+- Deploy key read-only (`148948558`), webhook push/pr/delete (`606928044`).
+
+Rollback de branch protection (solo si hace falta deshacer urgentemente):
+
+```bash
+gh api -X DELETE repos/jjmendoza-tpp/lumen-website/branches/main/protection
+# ... hacer el push correctivo ...
+gh api -X PUT repos/jjmendoza-tpp/lumen-website/branches/main/protection \
+  --input /tmp/branch-protection.json  # config guardada en decisions
+```
 
 ## SEO y discovery esperados
 
@@ -71,6 +111,13 @@ Proyecto: Lumen Landing
 - Si HubSpot vuelve a bloquear envíos, revisar primero la autorización del dominio `lumenapp.ai` dentro de HubSpot.
 - El repo Git conectado en Netlify y el remoto Git del workspace local deben revisarse antes de empujar cambios, para no publicar en un repositorio equivocado.
 
+## Pendientes de seguridad para próxima sesión
+
+- CAPTCHA en HubSpot form `04f6e5eb-168f-4d09-a034-749551ffb9ac` (Marketing → Forms → Options → Enable CAPTCHA). Protege contra lead spam en campañas.
+- DNS CAA records para `lumenapp.ai` restringiendo emisores de certificado (Let's Encrypt + el CA del correo, si aplica).
+- Chatwoot instancia `app.innovacion.ai`: rate-limit de creación de conversaciones + captcha en widget.
+- Submit `lumenapp.ai` a `https://hstspreload.org/` tras 1–2 semanas estables.
+
 ## Archivos clave
 
 - `app/layout.tsx`: metadata global, scripts de tracking, JSON-LD
@@ -81,7 +128,9 @@ Proyecto: Lumen Landing
 - `public/robots.txt`
 - `public/sitemap.xml`
 - `public/site.webmanifest`
-- `public/_headers`
+- `public/_headers` (security headers + MIME override del manifest)
+- `netlify.toml` (build command + Node version)
+- `eslint.config.mjs` (ignora `.netlify/`, `.playwright-cli/`, `.claude/`)
 
 ## Qué no romper
 

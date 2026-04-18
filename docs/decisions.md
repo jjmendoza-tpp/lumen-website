@@ -78,3 +78,40 @@
 
 - Decisión: reemplazar GTM, GA4 y LinkedIn por los IDs provistos en los manuales vigentes y mantener la misma arquitectura de carga global en `app/layout.tsx`.
 - Rationale: el sitio debe medir con los contenedores y propiedades activos del negocio; cambiar solo los IDs reduce riesgo y evita reabrir una integración ya estable.
+
+## 2026-04-18
+
+### Repo productivo correcto
+
+- Decisión: Netlify queda linkeado a `jjmendoza-tpp/lumen-website` (no `lumenapp-ai`).
+- Rationale: `lumenapp-ai` había quedado abandonado el 14 de abril; `lumen-website` es el repo activo. Linkeo vía `PATCH /sites/:id` + deploy key read-only (`148948558`) + webhook push/pr/delete (`606928044`).
+
+### Env vars para Chatwoot
+
+- Decisión: `CHATWOOT_BASE_URL` y `CHATWOOT_WEBSITE_TOKEN` se leen de `process.env.NEXT_PUBLIC_CHATWOOT_*` con fallback a los valores productivos hardcodeados.
+- Rationale: permite rotar el token desde Netlify sin redeploy manual ni tocar código, y no rompe builds si las env vars no existen.
+
+### Hardening de seguridad antes de campañas
+
+- Decisión: security headers completos en `public/_headers` (CSP allowlist, HSTS preload, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, COOP, form-action restringido).
+- Rationale: el sitio va a recibir tráfico pagado; atacantes motivados con LLMs van a probar XSS, clickjacking y SSL strip. Los headers eliminan la superficie trivial sin costo operativo.
+
+### Branch protection en `main`
+
+- Decisión: PRs obligatorios, linear history, force push/deletions bloqueados, `enforce_admins: true`, stale reviews auto-dismissed, conversation resolution required.
+- Rationale: previene que un token comprometido defacee producción con un `git push --force`. `required_approving_review_count: 0` mantiene velocidad — la gate es el PR mismo, no la revisión humana.
+
+### Upgrade Next 16.2.1 → 16.2.4
+
+- Decisión: subir Next a la última patch dentro de 16.2.x.
+- Rationale: parches de GHSA-q4gf-8mx6-v5v3 (DoS en Server Components) y GHSA-c2c7-rcm5-vvqj (picomatch ReDoS transitivo). `npm audit` en 0 tras el cambio.
+
+### Pendientes de hardening diferidos
+
+- Decisión: diferir a próxima sesión: CAPTCHA en HubSpot form, CAA DNS records, rate-limit + captcha en Chatwoot widget, submit a HSTS preload list.
+- Rationale: requieren credenciales fuera del alcance de esta sesión (HubSpot admin, DNS provider, Chatwoot admin, tiempo de observación). No bloquean lanzamiento básico pero son necesarios antes de abrir el grifo de campañas agresivas.
+
+### Baseline auditado
+
+- Decisión: tag `v1.0.0-verified-2026-04-18` sobre `c384408` como baseline productivo auditado.
+- Rationale: punto de retorno seguro si un cambio futuro introduce regresión.

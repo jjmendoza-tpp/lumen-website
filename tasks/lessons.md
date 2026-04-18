@@ -21,3 +21,15 @@
 - Un proyecto en producción no debe conservar un `README` de template. El repo necesita una capa mínima de documentación operativa dentro del propio código.
 - En un sitio 100% estático, la validación de identidad de Chatwoot no debe montarse en frontend: cualquier secreto o firma expuesta en cliente compromete la seguridad del inbox.
 - Cuando marketing comparte manuales nuevos, deben tratarse como la fuente de verdad operativa para GTM, GA4 y píxeles; no conviene reciclar IDs históricos aunque la implementación técnica no cambie.
+
+## 2026-04-18
+
+- Cuando un site de Netlify muestra `deploy_source: api` y `commit_ref: null`, no está enlazado a auto-deploy Git. La señal real de repo-linkeo es `build_settings.deploy_key_id != null` + webhook vivo en el repo. Verificar ambos antes de asumir CI/CD.
+- Un repo GitHub puede quedar linkeado en Netlify a un remoto viejo aunque el equipo ya migró al nuevo; el webhook sigue disparando pero al repo equivocado, así que pushes al repo correcto pasan desapercibidos. Revisar `build_settings.repo_path` vs `git remote -v` cuando los pushes "no hacen nada".
+- Linkear un repo nuevo a Netlify vía token personal (sin el GitHub App de Netlify) requiere 3 pasos: crear deploy key (`POST /deploy_keys`), registrar la public key read-only en GitHub (`gh api repos/.../keys`), crear webhook `push` apuntando a `https://api.netlify.com/hooks/github`. Luego `PATCH /sites/:id` con `{repo: {...}}` completa el binding.
+- Activar `enforce_admins: true` en branch protection invalida el `git push` directo incluso para el owner. Todo cambio pasa a requerir PR + squash. Documentar el comando de rollback (`gh api -X DELETE .../protection`) antes de activarlo para no quedar atrapado.
+- `gh` CLI con múltiples cuentas activa la última por default. Si el repo pertenece a otra cuenta, hacer `gh auth switch --user <owner>` antes de configurar security features; si no, todo devuelve `404 Not Found` con error engañoso.
+- El git credential helper de macOS cachea el primer token que funcionó. Con multi-cuenta GitHub, un `git push` puede enviar el token equivocado aunque `gh auth switch` haya cambiado la cuenta activa. Workaround: `git push "https://<user>:$TOKEN@github.com/..."` explícito para el push crítico.
+- Para una landing estática servida por CDN, la única superficie real de XSS son los scripts externos (GTM, GA4, LinkedIn, HubSpot, Chatwoot). CSP con allowlist estricto + `'unsafe-inline'` para scripts inline de Next es el compromiso mínimo viable; SRI no aplica a scripts cargados dinámicamente.
+- En marketing sites con tráfico pagado inminente, el mayor riesgo no es el exploit sofisticado sino el spam-bot masivo contra el form. CAPTCHA server-side en HubSpot mueve más la aguja que cualquier security header.
+- El connector MCP de Netlify expone read + env vars + repo config pero no `trigger-build`/`create-deploy`. Para disparar deploy manual el fallback es `netlify-cli` con `NETLIFY_AUTH_TOKEN` — pedir el token al usuario explícitamente, nunca asumir.

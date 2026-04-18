@@ -29,7 +29,7 @@ Si la landing replica fielmente el diseño del Figma Make, conserva el formulari
 - El Figma Make `cwSlzDVqfesWkMabiozOru` es la fuente de verdad actual.
 - El sitio ya está operativo en producción sobre Netlify y debe mantenerse sin degradar SEO, tracking ni captura de leads.
 - El usuario conectó Netlify a un repo Git de respaldo para continuidad operativa:
-  - `https://github.com/jjmendoza-tpp/lumenapp-ai`
+  - `https://github.com/jjmendoza-tpp/lumen-website`
 - Los IDs vigentes según los manuales más recientes son:
   - GTM: `GTM-KZNM7JNM`
   - GA4: `G-BWZW45MGRG`
@@ -40,6 +40,7 @@ Si la landing replica fielmente el diseño del Figma Make, conserva el formulari
 - Riesgo secundario: discovery deficiente si favicon, manifest, metadata o canonicals divergen del dominio final.
 - Riesgo operativo: Netlify puede quedar conectado a un repo distinto del remoto histórico del workspace local si no se verifica antes de futuros pushes.
 - Riesgo técnico: la validación de identidad de Chatwoot no debe implementarse en este frontend estático porque expondría un secreto operativo en cliente.
+- Riesgo de campaña: tráfico de marketing va a atraer bots — sin CAPTCHA en el form de HubSpot, el pipeline se envenena. Pendiente de hardening (ver `docs/operations.md` → Pendientes de seguridad).
 
 ## Restricciones
 

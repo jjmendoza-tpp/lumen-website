@@ -62,4 +62,39 @@
 - Widget web de Lumen publicado en producción y presente en el HTML servido por `lumenapp.ai`.
 - Queda pendiente únicamente la prueba manual end to end del chat desde navegador contra el inbox.
 - Pendiente nuevo de esta iteración: confirmar en las consolas de analytics/ads que el tráfico cae sobre los nuevos IDs.
+
+## Iteración 2026-04-18 — Auditoría + infraestructura + seguridad
+
+### Auditoría y consolidación
+
+- [x] Auditar `c384408`: diff, IDs, SEO, live URLs, Netlify deploy.
+- [x] Externalizar `CHATWOOT_*` a `NEXT_PUBLIC_*` con fallback.
+- [x] Añadir `.netlify/`, `.playwright-cli/`, `.claude/` al ESLint ignore.
+- [x] Eliminar código muerto (`CTAForm.tsx` + SVGs de scaffold Next.js).
+- [x] Silence de los 2 errores reales de React lint (setState-in-effect, `Math.random()` en render).
+- [x] Tag `v1.0.0-verified-2026-04-18` como baseline auditado.
+
+### Infraestructura Netlify ↔ GitHub
+
+- [x] Env vars `NEXT_PUBLIC_CHATWOOT_BASE_URL` y `NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN` en Netlify.
+- [x] Relinkear Netlify al repo correcto `jjmendoza-tpp/lumen-website` (antes apuntaba a `lumenapp-ai`).
+- [x] Crear deploy key read-only en Netlify y registrarla en GitHub (`148948558`).
+- [x] Crear webhook push/pull_request/delete → Netlify (`606928044`).
+- [x] Verificar end-to-end: push a `main` → auto-build + deploy en ~15–30s.
+
+### Hardening de seguridad (pre-campañas)
+
+- [x] Security headers en `public/_headers`: CSP, HSTS preload, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, COOP, form-action.
+- [x] Branch protection en `main`: PRs obligatorios, linear history, force push/deletions bloqueados, `enforce_admins: true`.
+- [x] Next 16.2.1 → 16.2.4 (GHSA-q4gf-8mx6-v5v3 + picomatch ReDoS). `npm audit` en 0.
+- [x] Secret scanning + push protection + Dependabot alerts + automated security fixes activos.
+- [x] HSTS completo: `max-age=63072000; includeSubDomains; preload`.
+- [x] Documentación actualizada (README + brief + decisions + operations + tasks + lessons).
+
+### Pendientes para siguiente sesión
+
+- [ ] Activar CAPTCHA en HubSpot form `04f6e5eb-168f-4d09-a034-749551ffb9ac` (UI HubSpot).
+- [ ] CAA DNS records en `lumenapp.ai` restringiendo emisores de certificado.
+- [ ] Chatwoot (`app.innovacion.ai`): rate-limit de creación de conversaciones + captcha en widget.
+- [ ] Submit `lumenapp.ai` a `https://hstspreload.org/` tras 1–2 semanas estables.
 - La actualización de GTM, GA4 y LinkedIn ya fue desplegada en producción y el HTML live expone `GTM-KZNM7JNM`, `G-BWZW45MGRG` y `9006578`.

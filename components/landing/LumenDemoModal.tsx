@@ -1239,6 +1239,7 @@ export function LumenDemoModal({ isOpen, onClose }: LumenDemoModalProps) {
                                 </div>
                                 <motion.span
                                   animate={{ opacity: [1, 0.4, 1] }}
+                                  // eslint-disable-next-line react-hooks/purity
                                   transition={{ duration: 2, repeat: Infinity, delay: Math.random() * 1.5 }}
                                   style={{
                                     width: 6,

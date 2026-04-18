@@ -12,8 +12,10 @@ const DEFAULT_DESCRIPTION_EN =
 const GTM_ID = "GTM-KZNM7JNM";
 const GA_ID = "G-BWZW45MGRG";
 const LINKEDIN_PARTNER_ID = "9006578";
-const CHATWOOT_BASE_URL = "https://app.innovacion.ai";
-const CHATWOOT_WEBSITE_TOKEN = "66KFTkHdoCo8eNDNRMBGisct";
+const CHATWOOT_BASE_URL =
+  process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL ?? "https://app.innovacion.ai";
+const CHATWOOT_WEBSITE_TOKEN =
+  process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN ?? "66KFTkHdoCo8eNDNRMBGisct";
 
 const urbanist = Urbanist({
   subsets: ["latin"],

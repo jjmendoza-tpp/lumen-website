@@ -639,103 +639,13 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
 
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: isCompact ? "1fr" : "5fr 7fr",
-            gap: isCompact ? "40px" : "56px",
-            alignItems: "start",
+            maxWidth: "720px",
+            margin: "0 auto",
             opacity: visible ? 1 : 0,
             transform: visible ? "translateY(0)" : "translateY(36px)",
             transition: "opacity 0.8s ease 0.18s, transform 0.8s ease 0.18s",
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-            <div>
-              <p
-                style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "11px",
-                  letterSpacing: "0.1em",
-                  color: isDark ? "rgba(255,255,255,0.35)" : "rgba(13,13,26,0.35)",
-                  textTransform: "uppercase",
-                  margin: "0 0 24px",
-                }}
-              >
-                CÓMO FUNCIONA
-              </p>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                {steps.map((step, index) => (
-                  <ProcessStep
-                    key={step.title}
-                    num={index + 1}
-                    icon={step.icon}
-                    title={step.title}
-                    desc={step.desc}
-                    color={step.color}
-                    textMain={textMain}
-                    text={text}
-                    isLast={index === steps.length - 1}
-                    isDark={isDark}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div
-              style={{
-                padding: "20px 24px",
-                background: isDark ? "rgba(45,0,255,0.06)" : "rgba(45,0,255,0.03)",
-                border: `1px solid ${isDark ? "rgba(45,0,255,0.18)" : "rgba(45,0,255,0.10)"}`,
-                borderRadius: "20px",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: "'Urbanist', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "12px",
-                  letterSpacing: "0.06em",
-                  color: isDark ? "rgba(255,255,255,0.4)" : "rgba(13,13,26,0.38)",
-                  textTransform: "uppercase",
-                  margin: "0 0 14px",
-                }}
-              >
-                NUESTRAS GARANTÍAS
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {guarantees.map((guarantee) => (
-                  <div key={guarantee} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <div
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        borderRadius: "50%",
-                        flexShrink: 0,
-                        background: "linear-gradient(135deg, #2D00FF, #8E00FF)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <IconCheck />
-                    </div>
-                    <span
-                      style={{
-                        fontFamily: "'Urbanist', sans-serif",
-                        fontWeight: 500,
-                        fontSize: "13px",
-                        color: text,
-                      }}
-                    >
-                      {guarantee}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
           <div
             style={{
               padding: "1.5px",

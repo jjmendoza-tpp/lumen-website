@@ -12,6 +12,31 @@ import {
 } from "react";
 import { LumenDemoModal } from "@/components/landing/LumenDemoModal";
 import { LumenHubSpotForm } from "@/components/landing/LumenHubSpotForm";
+import {
+  MessageCircle,
+  Mic,
+  Landmark,
+  Calendar,
+  ShoppingBag,
+  Headset,
+  Target,
+} from "lucide-react";
+
+// Brand glyphs not shipped by lucide (trademark). Inline SVG, monochrome,
+// rendered inside Lumen-colored pills to respect brand tokens.
+const IconWhatsApp = ({ size = 16, color = "currentColor" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+);
+
+const IconInstagram = ({ size = 16, color = "currentColor" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect width="20" height="20" x="2" y="2" rx="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
 
 declare global {
   interface Window {
@@ -209,59 +234,46 @@ const SectionDivider = () => {
   );
 };
 
+// Decorative 3D chrome shapes from Figma Make brandbook assets.
+// Rendered in both themes; positioning + parallax preserved from prior CSS version.
 function TorusShape({ size }: { size: number }) {
-  const border = Math.max(18, Math.round(size * 0.15));
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        border: `${border}px solid rgba(255,255,255,0.55)`,
-        boxShadow: "0 0 45px rgba(255,255,255,0.08), inset 0 0 30px rgba(255,255,255,0.06)",
-        filter: "blur(1px)",
-      }}
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/decor/shape-1.webp"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+      style={{ width: size, height: size, objectFit: "contain", pointerEvents: "none" }}
     />
   );
 }
 
 function CrescentShape({ size }: { size: number }) {
   return (
-    <div
-      style={{
-        position: "relative",
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        background: "rgba(255,255,255,0.58)",
-        filter: "blur(1px)",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          inset: "12%",
-          left: "36%",
-          background: "#000000",
-          borderRadius: "50%",
-        }}
-      />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/decor/shape-5.webp"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+      style={{ width: size, height: size, objectFit: "contain", pointerEvents: "none" }}
+    />
   );
 }
 
 function TeardropShape({ size }: { size: number }) {
   return (
-    <div
-      style={{
-        width: size,
-        height: Math.round(size * 1.16),
-        background: "rgba(255,255,255,0.58)",
-        borderRadius: "58% 58% 64% 64% / 74% 74% 44% 44%",
-        transform: "rotate(25deg)",
-        filter: "blur(6px)",
-        boxShadow: "0 0 35px rgba(255,255,255,0.08)",
-      }}
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/decor/shape-7.webp"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+      style={{ width: size, height: Math.round(size * 1.16), objectFit: "contain", pointerEvents: "none" }}
     />
   );
 }
@@ -970,19 +982,27 @@ const LumenHero = () => {
               >
                 <span
                   style={{
-                    width: isMobile ? 12 : 14,
-                    height: isMobile ? 12 : 14,
+                    width: isMobile ? 18 : 20,
+                    height: isMobile ? 18 : 20,
                     borderRadius: "50%",
                     background: channel.color,
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
                     color: "white",
-                    fontSize: isMobile ? 7 : 8,
-                    fontWeight: 800,
+                    flexShrink: 0,
                   }}
+                  aria-hidden="true"
                 >
-                  {channel.label === "Web Chat" ? "W" : channel.label[0]}
+                  {channel.label === "WhatsApp" ? (
+                    <IconWhatsApp size={isMobile ? 11 : 12} color="white" />
+                  ) : channel.label === "Instagram" ? (
+                    <IconInstagram size={isMobile ? 11 : 12} color="white" />
+                  ) : channel.label === "Web Chat" ? (
+                    <MessageCircle size={isMobile ? 11 : 12} strokeWidth={2.2} />
+                  ) : (
+                    <Mic size={isMobile ? 11 : 12} strokeWidth={2.2} />
+                  )}
                 </span>
                 {channel.label}
               </span>
@@ -2784,10 +2804,10 @@ const plans = [
     features: [
       "2,000 conversaciones IA / mes",
       "WhatsApp + 1 canal",
-      "3 agentes humanos (Chatwoot)",
+      "3 agentes humanos",
       "1 asistente IA",
       "1 base RAG (20 docs)",
-      "Modelo GPT-4o-mini",
+      "Razonamiento Básico",
       "Soporte por email",
     ],
     cta: "Comenzar",
@@ -2804,10 +2824,10 @@ const plans = [
     features: [
       "7,000 conversaciones IA / mes",
       "Todos los canales de mensajería",
-      "8 agentes humanos (Chatwoot)",
+      "8 agentes humanos",
       "3 asistentes IA",
       "3 bases RAG (50 docs c/u)",
-      "Modelo GPT-4o-mini",
+      "Razonamiento Básico",
       "Soporte email + chat",
     ],
     cta: "Comenzar",
@@ -2824,10 +2844,10 @@ const plans = [
     features: [
       "25,000 conversaciones IA / mes",
       "Todos los canales + Voz",
-      "20 agentes humanos (Chatwoot)",
+      "20 agentes humanos",
       "Asistentes IA ilimitados",
       "Bases RAG ilimitadas",
-      "GPT-4o-mini / GPT-4o",
+      "Razonamiento Básico y Avanzado",
       "Voice Bridge: 600 min incluidos",
       "Chat prioritario",
     ],
@@ -2848,9 +2868,9 @@ const plans = [
       "Agentes humanos ilimitados",
       "Asistentes IA ilimitados",
       "Bases RAG ilimitadas",
-      "Multi-LLM (OpenAI · Anthropic · Google)",
+      "Modelos Multi-LLM",
       "Voice Bridge incluido",
-      "Instancia Chatwoot dedicada",
+      "Instancia dedicada en Lumen",
       "Soporte dedicado",
     ],
     cta: "Hablar con ventas",
@@ -2862,7 +2882,7 @@ const addons = [
   { Icon: ChannelIcon, name: "Canal adicional", sub: "Solo plan Spark", price: "$39/mes", detail: "por canal extra", color: "#5B00E8" },
   { Icon: DatabaseIcon, name: "Base RAG adicional", sub: "Docs propios", price: "$69/mes", detail: "por base", color: "#8E00FF" },
   { Icon: ChatIcon, name: "Pack conversaciones", sub: "Prepago flexible", price: "$49", detail: "/ 1,000 conv", color: "#A400FF" },
-  { Icon: BrainIcon, name: "GPT-4o Premium", sub: "Razonamiento avanzado", price: "+$0.04", detail: "/ conversación", color: "#C400FF" },
+  { Icon: BrainIcon, name: "Razonamiento Extenso", sub: "Modelos de razonamiento avanzado", price: "+$0.04", detail: "/ conversación", color: "#C400FF" },
   { Icon: RocketIcon, name: "Onboarding Prometheus", sub: "Configuración asistida", price: "$1,500", detail: "fee único", color: "#2D00FF" },
 ];
 
@@ -3322,7 +3342,7 @@ const LumenPricing = () => {
               lineHeight: 1.6,
             }}
           >
-            Facturación mensual · Descuento 15% anual · Precios en USD
+            Facturación mensual · Precios en USD
           </p>
         </div>
 
@@ -3815,7 +3835,7 @@ const LumenPricing = () => {
             transition: "opacity 0.7s ease 0.45s",
           }}
         >
-          Precios en USD · Facturación mensual · Contrato anual con 15% de descuento · Vigentes a marzo 2026
+          Precios en USD · Facturación mensual · Vigentes a marzo 2026
         </p>
       </div>
     </section>
@@ -3856,12 +3876,30 @@ const comparisons = [
   { dimension: "Soporte regional LatAm", lumen: "Equipo dedicado en Guatemala", others: "Soporte global genérico" },
 ];
 
+type UseCaseIcon = (props: { size?: number; color?: string }) => ReactNode;
+
+const UseCaseIconBanca: UseCaseIcon = ({ size = 20, color = "currentColor" }) => (
+  <Landmark size={size} color={color} strokeWidth={1.8} aria-hidden="true" />
+);
+const UseCaseIconCalendar: UseCaseIcon = ({ size = 20, color = "currentColor" }) => (
+  <Calendar size={size} color={color} strokeWidth={1.8} aria-hidden="true" />
+);
+const UseCaseIconEcom: UseCaseIcon = ({ size = 20, color = "currentColor" }) => (
+  <ShoppingBag size={size} color={color} strokeWidth={1.8} aria-hidden="true" />
+);
+const UseCaseIconCallcenter: UseCaseIcon = ({ size = 20, color = "currentColor" }) => (
+  <Headset size={size} color={color} strokeWidth={1.8} aria-hidden="true" />
+);
+const UseCaseIconLeads: UseCaseIcon = ({ size = 20, color = "currentColor" }) => (
+  <Target size={size} color={color} strokeWidth={1.8} aria-hidden="true" />
+);
+
 const useCases = [
-  { icon: "🏦", title: "Seguros y Banca", desc: "Consulta de póliza y estado de reclamo en WhatsApp, sin esperar en línea.", color: "#2D00FF" },
-  { icon: "📅", title: "Agendamiento de Citas", desc: "Disponibilidad y confirmación en tiempo real vía API. Sin intermediarios.", color: "#5B00E8" },
-  { icon: "🛒", title: "E-commerce", desc: "Búsqueda de productos, estado de pedido y seguimiento postventa.", color: "#8E00FF" },
-  { icon: "📞", title: "Call Center con IA", desc: "Voice Bridge + resumen automático post-llamada + handoff a agente humano.", color: "#A400FF" },
-  { icon: "🎯", title: "Captura de Leads", desc: "Registro automático en CRM vía workflow. Ningún lead sin capturar.", color: "#C400FF" },
+  { Icon: UseCaseIconBanca, title: "Seguros y Banca", desc: "Consulta de póliza y estado de reclamo en WhatsApp, sin esperar en línea.", color: "#2D00FF" },
+  { Icon: UseCaseIconCalendar, title: "Agendamiento de Citas", desc: "Disponibilidad y confirmación en tiempo real vía API. Sin intermediarios.", color: "#5B00E8" },
+  { Icon: UseCaseIconEcom, title: "E-commerce", desc: "Búsqueda de productos, estado de pedido y seguimiento postventa.", color: "#8E00FF" },
+  { Icon: UseCaseIconCallcenter, title: "Call Center con IA", desc: "Voice Bridge + resumen automático post-llamada + handoff a agente humano.", color: "#A400FF" },
+  { Icon: UseCaseIconLeads, title: "Captura de Leads", desc: "Registro automático en CRM vía workflow. Ningún lead sin capturar.", color: "#C400FF" },
 ];
 
 const LumenComparativa = () => {
@@ -4017,7 +4055,8 @@ const LumenComparativa = () => {
               lineHeight: 1.6,
             }}
           >
-            Las herramientas genéricas no se conectan a tus sistemas reales. LUMEN sí.
+            Las herramientas genéricas no se conectan a tus sistemas reales.{" "}
+            <span style={{ whiteSpace: "nowrap" }}>LUMEN sí.</span>
           </p>
         </div>
 
@@ -4413,10 +4452,10 @@ const LumenComparativa = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: isMobile ? "16px" : "20px",
+                    color: useCase.color,
                   }}
                 >
-                  {useCase.icon}
+                  <useCase.Icon size={isMobile ? 16 : 18} color={useCase.color} />
                 </div>
                 <div>
                   <div
@@ -4519,7 +4558,7 @@ const LumenComparativa = () => {
               margin: "12px 0 0",
             }}
           >
-            Equipo Prometheus · Grupo Digital de Guatemala
+            Equipo LUMEN by Prometheus
           </p>
         </div>
       </div>

@@ -115,3 +115,20 @@
 
 - Decisión: tag `v1.0.0-verified-2026-04-18` sobre `c384408` como baseline productivo auditado.
 - Rationale: punto de retorno seguro si un cambio futuro introduce regresión.
+
+## 2026-04-19
+
+### Migración HubSpot embed v2 con reCAPTCHA Enterprise
+
+- Decisión: migrar de `hbspt.forms.create()` (legacy v2.js) al embed portal-scoped `js.hsforms.net/forms/embed/{portal}.js` que auto-renderiza elementos `.hs-form-frame` al cargar.
+- Rationale: el embed legacy no dispara reCAPTCHA cuando el form lo tiene activado. El nuevo embed es requerimiento de HubSpot para forms con CAPTCHA. Submit callback migrado de `onFormSubmitted` prop a `postMessage` listener con `type: 'hsFormCallback'` → `eventName: 'onFormSubmitted'`.
+
+### CSP extendido para HubSpot embed v2 + reCAPTCHA Enterprise
+
+- Decisión: añadir al allowlist CSP en `public/_headers`: `js.hsforms.net` + `*.hsforms.net` (frame-src para iframe del form), `*.hsappstatic.net` (CDN de bundles compartidos, en script/style/connect/font), y `google.com` / `www.google.com` / `recaptcha.net` / `www.recaptcha.net` (script/connect/frame para reCAPTCHA Enterprise).
+- Rationale: sin estos orígenes el form visible queda vacío (sin CSP allowlist del iframe) o el CAPTCHA nunca carga (orígenes sin www bloqueados). Descubierto empíricamente en validación browser post-deploy.
+
+### Chatwoot SDK path diferido a IT
+
+- Decisión: mantener `g.src = BASE_URL + "/packs/js/sdk.js"` en `app/layout.tsx` (el path que la admin UI de Chatwoot recomienda) con comentario explicativo, aunque el server actual devuelva 404.
+- Rationale: el bug está del lado server (Chatwoot v4.13.0 en `app.innovacion.ai` no compiló `pnpm run build:sdk` durante el image build → archivo ausente en filesystem). El código Lumen está correcto contra el contrato oficial. Cambiarlo a `/app/sdk.js` (probado, devuelve 200 con body vacío) sería esconder el bug y romper cuando IT fixee la infra.

@@ -113,10 +113,41 @@ gh api -X PUT repos/jjmendoza-tpp/lumen-website/branches/main/protection \
 
 ## Pendientes de seguridad para próxima sesión
 
-- CAPTCHA en HubSpot form `04f6e5eb-168f-4d09-a034-749551ffb9ac` (Marketing → Forms → Options → Enable CAPTCHA). Protege contra lead spam en campañas.
+- ~~CAPTCHA en HubSpot form `04f6e5eb-168f-4d09-a034-749551ffb9ac`~~ ✅ activado 2026-04-18.
 - DNS CAA records para `lumenapp.ai` restringiendo emisores de certificado (Let's Encrypt + el CA del correo, si aplica).
 - Chatwoot instancia `app.innovacion.ai`: rate-limit de creación de conversaciones + captcha en widget.
 - Submit `lumenapp.ai` a `https://hstspreload.org/` tras 1–2 semanas estables.
+
+## Pendientes IT — Chatwoot server-side (bloqueante para widget)
+
+**Problema**: el widget de Chatwoot no carga en `https://lumenapp.ai/` porque el SDK no está siendo servido por la instancia `https://app.innovacion.ai`.
+
+- `GET https://app.innovacion.ai/packs/js/sdk.js` → 404 (archivo físicamente ausente, nginx responde sin pasar por Rails).
+- `GET https://app.innovacion.ai/app/sdk.js` → 200 con `Content-Length: 0` (Rails SPA catch-all).
+- Chatwoot corriendo: v4.13.0 (confirmado en `/api`). `data_services: failing` reportado por el mismo endpoint — posible señal de salud de infra también.
+
+**Causa raíz diagnosticada** (contra el repo upstream `chatwoot/chatwoot` branch `release/4.13.0`):
+
+- El SDK se compila desde `app/javascript/entrypoints/sdk.js` con `pnpm run build:sdk` (modo library de Vite, formato IIFE, output `public/packs/js/sdk.js`).
+- Ese build está conectado al hook `before_assets_precompile` en `lib/tasks/build.rake`.
+- En `docker/Dockerfile` línea 85, `bundle exec rake assets:precompile` solo se ejecuta si `RAILS_ENV=production` al image build time.
+- Los assets del dashboard (`/vite/assets/...`) sí están presentes → el build general de Vite sí corrió. Lo que no corrió o falló silenciosamente fue `pnpm run build:sdk` (el `system()` del rake task no raise en fallo).
+
+**Estado código Lumen**: el snippet en `app/layout.tsx` sigue apuntando a `/packs/js/sdk.js` que es la ruta oficial de Chatwoot admin UI. Una vez IT resuelva, el widget aparecerá en producción sin cambios nuestros ni redeploy — es 100% client-side.
+
+**Fix sugerido a IT** (detalles en el email enviado a infra Lumen/Prometheus el 2026-04-19):
+
+1. Opción rápida (validación sin rebuild): `docker exec` al contenedor web y correr `cd /app && pnpm install --frozen-lockfile && pnpm run build:sdk`. Nginx sirve desde volumen, sin restart.
+2. Opción correcta: rebuild de imagen con `RAILS_ENV=production` al build time y validar que los logs muestren `-------------- Building SDK for Production --------------` seguido del output Vite.
+
+**Validación post-fix**:
+
+```bash
+curl -sI https://app.innovacion.ai/packs/js/sdk.js
+# Esperado: HTTP/1.1 200, Content-Type: application/javascript, Content-Length ~40000
+```
+
+**Responsable**: equipo IT/infra Prometheus. Jose confirmará cuando esté implementado.
 
 ## Archivos clave
 

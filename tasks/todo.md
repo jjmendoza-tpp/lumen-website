@@ -93,8 +93,12 @@
 
 ### Pendientes para siguiente sesión
 
-- [ ] Activar CAPTCHA en HubSpot form `04f6e5eb-168f-4d09-a034-749551ffb9ac` (UI HubSpot).
+- [x] Activar CAPTCHA en HubSpot form `04f6e5eb-168f-4d09-a034-749551ffb9ac` (hecho 2026-04-18; ajustes CSP + embed v2 + reCAPTCHA Enterprise origins aplicados en PRs #3/#4/#6).
 - [ ] CAA DNS records en `lumenapp.ai` restringiendo emisores de certificado.
 - [ ] Chatwoot (`app.innovacion.ai`): rate-limit de creación de conversaciones + captcha en widget.
 - [ ] Submit `lumenapp.ai` a `https://hstspreload.org/` tras 1–2 semanas estables.
+
+### Bloqueantes externos — pendiente IT/Prometheus
+
+- [ ] **Chatwoot SDK no se sirve en `app.innovacion.ai` (v4.13.0)**: `public/packs/js/sdk.js` ausente en filesystem del container web. Causa diagnosticada contra upstream `chatwoot/chatwoot` branch `release/4.13.0`: `pnpm run build:sdk` no corrió o falló silenciosamente en el image build (Rails `system()` no raise). Solución: `docker exec` + `pnpm run build:sdk` en el container, o rebuild con `RAILS_ENV=production`. Detalle completo en `docs/operations.md` → Pendientes IT. Email a infra enviado 2026-04-19. Jose confirmará cuando se resuelva; no requiere cambios del lado website.
 - La actualización de GTM, GA4 y LinkedIn ya fue desplegada en producción y el HTML live expone `GTM-KZNM7JNM`, `G-BWZW45MGRG` y `9006578`.

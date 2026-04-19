@@ -579,11 +579,22 @@ const LumenNavbar = () => {
           boxShadow: !isDark && scrolled ? "0 1px 24px rgba(0,0,0,0.06)" : "none",
         }}
       >
-        <img
-          src={isDark ? LOGO_LIGHT : LOGO_DARK}
-          alt="LUMEN"
-          style={{ height: isMobile ? "40px" : "49px", width: "auto", objectFit: "contain" }}
-        />
+        <a
+          href="#top"
+          onClick={(event) => {
+            event.preventDefault();
+            trackEvent("nav_click", { label: "logo_home" });
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          aria-label="Lumen — ir al inicio"
+          style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}
+        >
+          <img
+            src={isDark ? LOGO_LIGHT : LOGO_DARK}
+            alt="LUMEN"
+            style={{ height: isMobile ? "40px" : "49px", width: "auto", objectFit: "contain", cursor: "pointer" }}
+          />
+        </a>
 
         {!isCompact ? (
           <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
@@ -636,13 +647,11 @@ const LumenNavbar = () => {
           </button>
 
           {!isCompact ? (
-            <button
-              type="button"
-              onClick={() => {
-                trackEvent("cta_click", { label: "navbar_demo" });
-                setDemoOpen(true);
-              }}
+            <a
+              href="#contacto-general"
+              onClick={() => trackEvent("cta_click", { label: "navbar_demo" })}
               style={{
+                textDecoration: "none",
                 background: "linear-gradient(135deg, #2D00FF, #8E00FF)",
                 color: "white",
                 border: "none",
@@ -652,6 +661,8 @@ const LumenNavbar = () => {
                 fontWeight: 700,
                 fontSize: "15px",
                 cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
                 boxShadow: isDark
                   ? "0 0 24px rgba(45,0,255,0.35)"
                   : "0 4px 20px rgba(45,0,255,0.28)",
@@ -665,7 +676,7 @@ const LumenNavbar = () => {
               }}
             >
               Solicita una Demo
-            </button>
+            </a>
           ) : (
             <button
               type="button"
@@ -741,14 +752,15 @@ const LumenNavbar = () => {
                 {link.label}
               </a>
             ))}
-            <button
-              type="button"
+            <a
+              href="#contacto-general"
               onClick={() => {
                 trackEvent("cta_click", { label: "mobile_menu_demo" });
                 setMenuOpen(false);
-                setDemoOpen(true);
               }}
               style={{
+                textDecoration: "none",
+                textAlign: "center",
                 width: "100%",
                 marginTop: "16px",
                 background: "linear-gradient(135deg, #2D00FF, #8E00FF)",
@@ -761,10 +773,11 @@ const LumenNavbar = () => {
                 fontSize: "16px",
                 cursor: "pointer",
                 boxShadow: "0 4px 20px rgba(45,0,255,0.35)",
+                display: "block",
               }}
             >
               Solicita una Demo
-            </button>
+            </a>
           </div>
         </div>
       ) : null}

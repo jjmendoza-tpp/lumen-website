@@ -520,7 +520,7 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
       ref={sectionRef}
       id="contacto-general"
       style={{
-        padding: `${isMobile ? "40px" : "80px"} ${px} ${isMobile ? "60px" : "100px"}`,
+        padding: `${isMobile ? "40px" : "80px"} ${px} ${isMobile ? "32px" : "48px"}`,
         position: "relative",
         overflow: "hidden",
       }}
@@ -639,7 +639,8 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
 
         <div
           style={{
-            maxWidth: "720px",
+            width: "100%",
+            maxWidth: isMobile ? "100%" : "1040px",
             margin: "0 auto",
             opacity: visible ? 1 : 0,
             transform: visible ? "translateY(0)" : "translateY(36px)",
@@ -659,101 +660,7 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
             <div style={{ borderRadius: "27px", background: cardBg, overflow: "hidden" }}>
               <div
                 style={{
-                  padding: isMobile ? "16px 20px" : "20px 32px",
-                  borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(45,0,255,0.07)"}`,
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(45,0,255,0.07) 0%, rgba(142,0,255,0.04) 100%)"
-                    : "linear-gradient(135deg, rgba(45,0,255,0.03) 0%, rgba(142,0,255,0.02) 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "10px",
-                      background: "linear-gradient(135deg, #2D00FF, #8E00FF)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      boxShadow: "0 0 12px rgba(45,0,255,0.45)",
-                    }}
-                  >
-                    <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
-                      <path
-                        d="M4 4h12c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                        stroke="white"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <path d="M2 6l8 6 8-6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontFamily: "'Urbanist', sans-serif",
-                        fontWeight: 700,
-                        fontSize: "13px",
-                        color: textMain,
-                      }}
-                    >
-                      Contacto Directo
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'Urbanist', sans-serif",
-                        fontWeight: 400,
-                        fontSize: "11px",
-                        color: textFaint,
-                        marginTop: "1px",
-                      }}
-                    >
-                      LUMEN Motor Conversacional
-                    </div>
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    background: isDark ? "rgba(45,0,255,0.12)" : "rgba(45,0,255,0.06)",
-                    border: `1px solid ${isDark ? "rgba(45,0,255,0.25)" : "rgba(45,0,255,0.12)"}`,
-                    borderRadius: "100px",
-                    padding: "5px 10px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "6px",
-                      height: "6px",
-                      borderRadius: "50%",
-                      background: "#22C55E",
-                      boxShadow: "0 0 6px rgba(34,197,94,0.8)",
-                      animation: "shimmer 2s ease-in-out infinite",
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontFamily: "'Urbanist', sans-serif",
-                      fontWeight: 600,
-                      fontSize: "10px",
-                      letterSpacing: "0.05em",
-                      color: isDark ? "rgba(255,255,255,0.5)" : "rgba(13,13,26,0.45)",
-                    }}
-                  >
-                    EN LÍNEA
-                  </span>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  padding: isMobile ? "24px 20px 28px" : "32px 36px 36px",
+                  padding: isMobile ? "24px 20px 28px" : "40px 48px 40px",
                   background: cardBg,
                 }}
               >

@@ -3835,7 +3835,7 @@ const LumenPricing = () => {
             transition: "opacity 0.7s ease 0.45s",
           }}
         >
-          Precios en USD · Facturación mensual · Vigentes a marzo 2026
+          Precios en USD · Facturación mensual
         </p>
       </div>
     </section>
@@ -3873,7 +3873,7 @@ const comparisons = [
   { dimension: "Voz en tiempo real", lumen: "Incluida en Scale y Enterprise", others: "Raro o inexistente" },
   { dimension: "Multi-LLM", lumen: "OpenAI · Anthropic · Google", others: "Solo OpenAI" },
   { dimension: "Privacidad de datos", lumen: "Datos en tu propio stack", others: "Datos en servidores del proveedor" },
-  { dimension: "Soporte regional LatAm", lumen: "Equipo dedicado en Guatemala", others: "Soporte global genérico" },
+  { dimension: "Soporte regional LatAm", lumen: "Equipo local con alcance regional", others: "Soporte global genérico" },
 ];
 
 type UseCaseIcon = (props: { size?: number; color?: string }) => ReactNode;

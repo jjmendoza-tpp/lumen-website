@@ -172,7 +172,12 @@ s.parentNode.insertBefore(b, s);
           {`(function(d,t) {
   var BASE_URL="${CHATWOOT_BASE_URL}";
   var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-  g.src=BASE_URL+"/app/sdk.js";
+  // Chatwoot admin UI recommends /packs/js/sdk.js. The Vite migration of
+  // the instance at app.innovacion.ai currently returns 404 for this path
+  // and /app/sdk.js serves an empty HTML body — pending IT fix on the
+  // Chatwoot server-side asset pipeline. Once resolved the widget will
+  // load without any change to this file.
+  g.src=BASE_URL+"/packs/js/sdk.js";
   g.async=true;
   s.parentNode.insertBefore(g,s);
   g.onload=function(){

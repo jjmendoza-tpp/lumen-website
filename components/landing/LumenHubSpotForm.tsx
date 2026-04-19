@@ -5,18 +5,15 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 declare global {
   interface Window {
     dataLayer: Array<Record<string, unknown>>;
-    hbspt?: {
-      forms: {
-        create: (options: Record<string, unknown>) => void;
-      };
-    };
   }
 }
 
 const PORTAL_ID = "50799369";
 const FORM_ID = "04f6e5eb-168f-4d09-a034-749551ffb9ac";
 const REGION = "na1";
-const SCRIPT_SRC = "https://js.hsforms.net/forms/embed/v2.js";
+// HubSpot embed v2 (portal-scoped loader). Required for forms with
+// reCAPTCHA enabled. Auto-renders any `.hs-form-frame` element on mount.
+const SCRIPT_SRC = `https://js.hsforms.net/forms/embed/${PORTAL_ID}.js`;
 
 const IconSend = () => (
   <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
@@ -394,49 +391,39 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
       return;
     }
 
-    const renderForm = () => {
-      if (!window.hbspt || !formTargetRef.current) {
-        return;
-      }
+    formCreated.current = true;
 
-      try {
-        formCreated.current = true;
-        window.hbspt.forms.create({
-          region: REGION,
-          portalId: PORTAL_ID,
-          formId: FORM_ID,
-          target: `#${formTargetRef.current.id}`,
-          css: hubspotInlineCSS,
-          onFormReady: () => {
-            setTimeout(() => markFormReady(), 300);
-          },
-          onFormSubmitted: () => {
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({ event: "hubspot_form_submit", formId: FORM_ID });
-          },
-        });
-      } catch (error) {
-        formCreated.current = false;
-        console.error("Error rendering HubSpot form:", error);
-      }
-    };
-
+    // HubSpot embed v2 auto-renders any `.hs-form-frame` it finds on DOM
+    // mount. No manual `hbspt.forms.create(...)` call — required for
+    // forms with reCAPTCHA enabled.
     const existing = document.querySelector(`script[src="${SCRIPT_SRC}"]`);
-
-    if (existing && window.hbspt) {
-      renderForm();
+    if (existing) {
       return;
     }
 
     const script = document.createElement("script");
     script.src = SCRIPT_SRC;
-    script.async = true;
-    script.onload = () => renderForm();
+    script.defer = true;
     script.onerror = () => {
       console.error("Failed to load HubSpot form script");
     };
     document.head.appendChild(script);
-  }, [hubspotInlineCSS]);
+
+    // Bridge submit event from the embed iframe into dataLayer.
+    const onMessage = (event: MessageEvent) => {
+      if (
+        typeof event.data === "object" &&
+        event.data !== null &&
+        (event.data as { type?: string }).type === "hsFormCallback" &&
+        (event.data as { eventName?: string }).eventName === "onFormSubmitted"
+      ) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: "hubspot_form_submit", formId: FORM_ID });
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
 
   useEffect(() => {
     const target = formTargetRef.current;
@@ -886,7 +873,7 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
 
                 <div
                   id="hubspot-form-lumen"
-                  className="hs-form-shell"
+                  className="hs-form-frame hs-form-shell"
                   data-hubspot-form="true"
                   data-region={REGION}
                   data-form-id={FORM_ID}

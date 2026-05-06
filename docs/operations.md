@@ -60,6 +60,7 @@ NETLIFY_AUTH_TOKEN=<token> npx netlify-cli deploy --prod \
 - GTM: `GTM-KZNM7JNM`
 - GA4: `G-BWZW45MGRG`
 - LinkedIn Insight: `9006578`
+- Meta Pixel: `1972992626291725` (PageView automático en `<head>`. Conversions API access token vive en Netlify env var `META_CAPI_ACCESS_TOKEN` — server-side only, jamás en cliente.)
 - HubSpot portal: `50799369`
 - HubSpot form: `04f6e5eb-168f-4d09-a034-749551ffb9ac`
 - Chat widget base URL: `https://app.innovacion.ai` (env `NEXT_PUBLIC_CHATWOOT_BASE_URL`)
@@ -71,7 +72,7 @@ Env vars viven en Netlify (Site configuration → Environment variables), contex
 
 Headers en `public/_headers` (verificables con `curl -sI https://lumenapp.ai/`):
 
-- `Content-Security-Policy` allowlist: GTM, GA4, LinkedIn, HubSpot, Chatwoot.
+- `Content-Security-Policy` allowlist: GTM, GA4, LinkedIn, Meta Pixel, HubSpot, Chatwoot.
 - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`.
 - `X-Frame-Options: DENY` + `frame-ancestors 'none'`.
 - `X-Content-Type-Options: nosniff`.

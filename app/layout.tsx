@@ -142,25 +142,29 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
         </Script>
-        <Script id="linkedin-partner" strategy="afterInteractive">
-          {`_linkedin_partner_id = "${LINKEDIN_PARTNER_ID}";
+        {/* LinkedIn Insight Tag — instalado verbatim según el manual oficial.
+            Se renderiza como <script> plano en <head> (no envuelto por
+            next/script) para garantizar que getElementsByTagName("script")[0]
+            tenga un parentNode válido al ejecutarse el IIFE. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `_linkedin_partner_id = "${LINKEDIN_PARTNER_ID}";
 window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-window._linkedin_data_partner_ids.push(_linkedin_partner_id);`}
-        </Script>
-        <Script id="linkedin-insight" strategy="afterInteractive">
-          {`(function(l) {
-if (!l) {
-window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
-window.lintrk.q = [];
-}
+window._linkedin_data_partner_ids.push(_linkedin_partner_id);`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(l) {
+if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+window.lintrk.q=[]}
 var s = document.getElementsByTagName("script")[0];
 var b = document.createElement("script");
-b.type = "text/javascript";
-b.async = true;
+b.type = "text/javascript";b.async = true;
 b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
-s.parentNode.insertBefore(b, s);
-})(window.lintrk);`}
-        </Script>
+s.parentNode.insertBefore(b, s);})(window.lintrk);`,
+          }}
+        />
         <Script id="chatwoot-settings" strategy="afterInteractive">
           {`window.chatwootSettings = {
   position: "right",

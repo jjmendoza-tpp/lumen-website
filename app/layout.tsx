@@ -122,6 +122,10 @@ export default function RootLayout({
   return (
     <html lang="es" className={urbanist.variable}>
       <head>
+        <meta
+          name="facebook-domain-verification"
+          content="q9pbenuvjxiskf2v7ossys0vg8ndws"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

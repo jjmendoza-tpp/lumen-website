@@ -102,3 +102,26 @@
 
 - [ ] **Chatwoot SDK no se sirve en `app.innovacion.ai` (v4.13.0)**: `public/packs/js/sdk.js` ausente en filesystem del container web. Causa diagnosticada contra upstream `chatwoot/chatwoot` branch `release/4.13.0`: `pnpm run build:sdk` no corrió o falló silenciosamente en el image build (Rails `system()` no raise). Solución: `docker exec` + `pnpm run build:sdk` en el container, o rebuild con `RAILS_ENV=production`. Detalle completo en `docs/operations.md` → Pendientes IT. Email a infra enviado 2026-04-19. Jose confirmará cuando se resuelva; no requiere cambios del lado website.
 - La actualización de GTM, GA4 y LinkedIn ya fue desplegada en producción y el HTML live expone `GTM-KZNM7JNM`, `G-BWZW45MGRG` y `9006578`.
+
+## Iteración 2026-05-06 — Analytics: LinkedIn Insight + Meta Pixel + verificación de dominio
+
+- [x] PR #12 — Reparar LinkedIn Insight Tag (`<script>` plano fuera de `next/script`) + endurecer CSP (script-src-elem, COOP same-origin-allow-popups, googleadservices). Deployado y validado en prod (`px.ads.linkedin.com/collect → 302`, `lintrk` función, sin errores CSP).
+- [x] PR #13 — Instalar Meta Pixel `1972992626291725`. Deployado y validado en prod (`fbq` función v2.9.313, `signals/config/1972992626291725 → 200`). Warning de Meta sobre Traffic Permissions resuelto del lado del usuario (configuración abierta a todos los dominios).
+- [x] PR #14 — Añadir `<meta name="facebook-domain-verification" content="q9pbenuvjxiskf2v7ossys0vg8ndws" />` en `<head>` para verificar `lumenapp.ai` en Meta Business Manager. **Mergeado a `main` (commit `dc5dad2`) pero NO desplegado a producción.**
+
+### Bloqueante externo — créditos Netlify agotados
+
+- [ ] **Forzar deploy del commit `dc5dad2` cuando se renueven créditos de Netlify (~7 días, ciclo mensual).** Mensaje literal de Netlify: *"This team has exceeded the credit limit. We have given you a few extra credits to keep your sites running. Upgrade to get more credits."* El cambio es trivial (4 líneas, una `<meta>` estática) y no afecta producción actual; solo bloquea la verificación de dominio en Meta. Acción: Netlify dashboard → Deploys → *Trigger deploy* → *Deploy site* sobre `main`, luego validar con `curl -s https://lumenapp.ai/ | grep facebook-domain-verification` y dar click *Verify domain* en Meta Business Manager → Brand Safety → Domains.
+
+### Pendientes del usuario en consolas externas (no bloqueantes para el código)
+
+- [ ] LinkedIn Campaign Manager — verificar dominio `lumenapp.ai` y confirmar que Insight Tag pase de "Sin verificar" a "Activo".
+- [ ] Auditar contenedor GTM `KZNM7JNM` en Preview Mode para confirmar que NO existe tag duplicado de LinkedIn Insight.
+- [ ] Meta Events Manager → Probar eventos: confirmar `PageView` desde `lumenapp.ai` tras renovar créditos y desplegar PR #14.
+- [ ] Asignar el pixel `1972992626291725` al dominio una vez verificado en Meta.
+- [x] ~~Rotar el CAPI access token~~ — Decisión 2026-05-08: NO se rota por ahora. El token sigue siendo el original generado el 2026-05-06. Cuando se implemente Conversions API server-side en Sprint 3 de la migración v2 (Astro + AWS), se cargará como env var en AWS (Lambda secret o SSM Parameter Store), no en cliente.
+
+### Fase 2 (cuando el usuario lo priorice)
+
+- [ ] Conversions API server-side desde el form de HubSpot vía Netlify Function. Token vivirá como env var `META_CAPI_ACCESS_TOKEN` en Netlify, jamás en el repo.
+- [ ] Eventos custom client-side: `fbq('track', 'Lead')` en submit del HubSpot form, `fbq('track', 'Contact')` en click a WhatsApp/Chatwoot.

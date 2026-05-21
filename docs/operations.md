@@ -60,7 +60,7 @@ NETLIFY_AUTH_TOKEN=<token> npx netlify-cli deploy --prod \
 - GTM: `GTM-KZNM7JNM`
 - GA4: `G-BWZW45MGRG`
 - LinkedIn Insight: `9006578`
-- Meta Pixel: `1972992626291725` (PageView automático en `<head>`. Conversions API access token vive en Netlify env var `META_CAPI_ACCESS_TOKEN` — server-side only, jamás en cliente.)
+- Meta Pixel: `982145840992357` — pixel oficial "Lumen AI - lumenapp.ai" creado en Business Manager de Prometheus. PageView automático en `<head>`. Conversions API access token vive en Netlify env var `META_CAPI_ACCESS_TOKEN` — server-side only, jamás en cliente. (Nota histórica: PR #13 instaló erróneamente `1972992626291725` que pertenecía a otro cliente; corregido en PR #16.)
 - HubSpot portal: `50799369`
 - HubSpot form: `04f6e5eb-168f-4d09-a034-749551ffb9ac`
 - Chat widget base URL: `https://app.innovacion.ai` (env `NEXT_PUBLIC_CHATWOOT_BASE_URL`)

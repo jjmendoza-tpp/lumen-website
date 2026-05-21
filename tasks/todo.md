@@ -106,7 +106,8 @@
 ## Iteración 2026-05-06 — Analytics: LinkedIn Insight + Meta Pixel + verificación de dominio
 
 - [x] PR #12 — Reparar LinkedIn Insight Tag (`<script>` plano fuera de `next/script`) + endurecer CSP (script-src-elem, COOP same-origin-allow-popups, googleadservices). Deployado y validado en prod (`px.ads.linkedin.com/collect → 302`, `lintrk` función, sin errores CSP).
-- [x] PR #13 — Instalar Meta Pixel `1972992626291725`. Deployado y validado en prod (`fbq` función v2.9.313, `signals/config/1972992626291725 → 200`). Warning de Meta sobre Traffic Permissions resuelto del lado del usuario (configuración abierta a todos los dominios).
+- [x] PR #13 — Instalar Meta Pixel `1972992626291725`. Deployado y validado en prod (`fbq` función v2.9.313, `signals/config/1972992626291725 → 200`). Warning de Meta sobre Traffic Permissions resuelto del lado del usuario (configuración abierta a todos los dominios). **NOTA 2026-05-21: ese pixel pertenecía a otro cliente, corregido en PR #16 con el ID oficial `982145840992357`.**
+- [x] PR #16 — Corregir Meta Pixel a `982145840992357` ("Lumen AI - lumenapp.ai", pixel oficial del Business Manager de Prometheus). Mismo snippet/CSP, solo cambia el ID.
 - [x] PR #14 — Añadir `<meta name="facebook-domain-verification" content="q9pbenuvjxiskf2v7ossys0vg8ndws" />` en `<head>` para verificar `lumenapp.ai` en Meta Business Manager. **Mergeado a `main` (commit `dc5dad2`) pero NO desplegado a producción.**
 
 ### Bloqueante externo — créditos Netlify agotados
@@ -118,7 +119,8 @@
 - [ ] LinkedIn Campaign Manager — verificar dominio `lumenapp.ai` y confirmar que Insight Tag pase de "Sin verificar" a "Activo".
 - [ ] Auditar contenedor GTM `KZNM7JNM` en Preview Mode para confirmar que NO existe tag duplicado de LinkedIn Insight.
 - [ ] Meta Events Manager → Probar eventos: confirmar `PageView` desde `lumenapp.ai` tras renovar créditos y desplegar PR #14.
-- [ ] Asignar el pixel `1972992626291725` al dominio una vez verificado en Meta.
+- [x] ~~Asignar el pixel `1972992626291725` al dominio~~ — INVALIDADO: ese pixel pertenecía a otro cliente, no a Lumen. El pixel correcto es `982145840992357` ("Lumen AI - lumenapp.ai"), instalado en PR #16.
+- [ ] Asignar el pixel correcto `982145840992357` al dominio `lumenapp.ai` verificado en Meta Business Manager.
 - [x] ~~Rotar el CAPI access token~~ — Decisión 2026-05-08: NO se rota por ahora. El token sigue siendo el original generado el 2026-05-06. Cuando se implemente Conversions API server-side en Sprint 3 de la migración v2 (Astro + AWS), se cargará como env var en AWS (Lambda secret o SSM Parameter Store), no en cliente.
 
 ### Fase 2 (cuando el usuario lo priorice)

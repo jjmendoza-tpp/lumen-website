@@ -11,8 +11,8 @@ const DEFAULT_DESCRIPTION_ES =
 const DEFAULT_DESCRIPTION_EN =
   "Lumen AI centralizes WhatsApp, voice, email and social channels to reply, qualify leads and route conversations to the right agent in seconds.";
 const GTM_ID = "GTM-KZNM7JNM";
-const GA_ID = "G-BWZW45MGRG";
-const LINKEDIN_PARTNER_ID = "9006578";
+// GA4 (G-BWZW45MGRG) y LinkedIn Insight (9006578) se sirven únicamente vía
+// GTM-KZNM7JNM — no instalarlos directo aquí (duplican medición).
 const META_PIXEL_ID = "982145840992357";
 const CHATWOOT_BASE_URL =
   process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL ?? "https://app.innovacion.ai";
@@ -179,25 +179,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${GTM_ID}');`}
         </Script>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga4-config" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
-        </Script>
-        {/* Loaders consent-gated (Consent Mode v2) — LinkedIn Insight y Meta
-            Pixel son scripts sin consent built-in, así que se inyectan SOLO
-            con consentimiento de marketing; Chatwoot (cookies + WebSocket)
-            requiere analítica + marketing, igual que en prometheus-website.
-            Los snippets internos son los oficiales verbatim de cada vendor.
-            Script plano en <head> (no next/script) para garantizar que
-            getElementsByTagName("script")[0] tenga un parentNode válido al
-            ejecutarse cada IIFE. Chatwoot: el sdk.js en /packs/js/sdk.js
-            sigue pendiente de fix server-side en app.innovacion.ai. */}
+        {/* GA4 y LinkedIn Insight NO se instalan directo: viven en el
+            container GTM-KZNM7JNM v5 (GA4 Configuration en Consent Mode
+            avanzado; LinkedIn Insight Base hard-gateado a ad_storage).
+            Instalarlos también aquí duplicaba page_views de GA4 y el
+            partner id de LinkedIn (auditoría GTM 2026-06-12). */}
+        {/* Loaders consent-gated (Consent Mode v2) — el Meta Pixel base sí
+            se instala aquí (GTM solo tiene tags de eventos que dependen de
+            window.fbq) pero SOLO con consentimiento de marketing; Chatwoot
+            (cookies + WebSocket) requiere analítica + marketing, igual que
+            en prometheus-website. Los snippets internos son los oficiales
+            verbatim de cada vendor. Script plano en <head> (no next/script)
+            para garantizar que getElementsByTagName("script")[0] tenga un
+            parentNode válido al ejecutarse cada IIFE. Chatwoot: el sdk.js
+            en /packs/js/sdk.js sigue pendiente de fix server-side en
+            app.innovacion.ai. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function () {
@@ -207,18 +203,6 @@ gtag('config', '${GA_ID}');`}
   function loadMarketing() {
     if (loadedMarketing) return;
     loadedMarketing = true;
-
-    window._linkedin_partner_id = "${LINKEDIN_PARTNER_ID}";
-    window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-    window._linkedin_data_partner_ids.push(window._linkedin_partner_id);
-    (function(l) {
-    if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
-    window.lintrk.q=[]}
-    var s = document.getElementsByTagName("script")[0];
-    var b = document.createElement("script");
-    b.type = "text/javascript";b.async = true;
-    b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
-    s.parentNode.insertBefore(b, s);})(window.lintrk);
 
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?

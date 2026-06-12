@@ -2,7 +2,11 @@ import { LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
 
 const colProducto = ["Capacidades", "Integraciones", "Precios", "Changelog", "Status"];
 const colEmpresa = ["Sobre Prometheus", "Partners", "Blog", "Casos de éxito", "Contacto"];
-const colLegal = ["Términos de uso", "Privacidad", "Cookies"];
+const colLegal = [
+  { label: "Términos de uso", href: "/legal/terminos" },
+  { label: "Privacidad", href: "/legal/privacidad" },
+  { label: "Cookies", href: "/legal/cookies" },
+];
 
 export default function Footer() {
   return (
@@ -82,12 +86,12 @@ export default function Footer() {
               </p>
               <ul className="flex flex-col gap-2.5">
                 {colLegal.map((item) => (
-                  <li key={item}>
+                  <li key={item.label}>
                     <a
-                      href="#"
+                      href={item.href}
                       className="text-sm text-[#7E8FA6] hover:text-white transition-colors duration-200"
                     >
-                      {item}
+                      {item.label}
                     </a>
                   </li>
                 ))}

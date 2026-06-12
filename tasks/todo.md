@@ -127,3 +127,19 @@
 
 - [ ] Conversions API server-side desde el form de HubSpot vía Netlify Function. Token vivirá como env var `META_CAPI_ACCESS_TOKEN` en Netlify, jamás en el repo.
 - [ ] Eventos custom client-side: `fbq('track', 'Lead')` en submit del HubSpot form, `fbq('track', 'Contact')` en click a WhatsApp/Chatwoot.
+
+## Iteración 2026-06-12 — Consent Mode v2 + dedupe de tracking + páginas legales
+
+- [x] PR #18 — Consent Mode v2: default-deny inline + replay desde `localStorage('lumen:consent:v1')` ANTES del loader GTM (`wait_for_update: 500`), CookieBanner (aceptar/rechazar/personalizar), loaders consent-gated para Meta Pixel, LinkedIn y Chatwoot, removidos los `<noscript>` beacons incondicionales de Meta/LinkedIn. Validado en dev: pre-consent `gcs=G100` sin requests a Meta/LinkedIn; accept → `gcs=G111`; reject persiste; replay en revisita OK. **Pendiente: merge a `main` (decisión del usuario) + validación en producción.**
+- [x] Auditoría del container GTM `KZNM7JNM` vía API (read-only, live version 5 `consent-mode-advanced-2026-06-11`): GA4 Configuration + 9 eventos GA4 en Consent Mode avanzado (`notNeeded`), LinkedIn Insight Base + HubSpot + 3 eventos Meta + LinkedIn Lead como Custom HTML hard-gateados. **Conclusión dedupe**: GA4 y LinkedIn estaban DUPLICADOS (GTM + install directo en layout → doble page_view GA4 confirmado con 2 pings `g/collect`); Meta NO está duplicado (GTM solo tiene tags de eventos que dependen de `window.fbq` — el pixel base del sitio es necesario).
+- [x] PR de dedupe — removidos del layout el GA4 directo (`gtag/js` + `gtag('config')`) y el LinkedIn Insight directo; quedan servidos únicamente por GTM con su gating correcto. El Meta Pixel base permanece en el sitio (consent-gated).
+- [x] Páginas legales V1 (borrador, noindex, pendiente revisión legal externa): `/legal/terminos`, `/legal/privacidad`, `/legal/cookies` adaptadas de prometheus-website. Footer enlaza las 3; el CookieBanner enlaza "Más detalle" → `/legal/cookies`; botón "Cambiar mis preferencias" reabre el banner (`lumen:cookie-prefs-open`).
+- [x] Verificado en producción que el commit `dc5dad2` (meta verificación de dominio Meta) YA está deployado — el bloqueante de créditos Netlify quedó resuelto. **Falta solo el click "Verify domain" en Meta Business Manager → Brand Safety → Domains.**
+
+### Pendientes del usuario (consolas externas / decisiones)
+
+- [ ] Merge de PR #18 (Consent Mode v2) y luego del PR de dedupe+legal (stacked). Tras deploy: validar con Tag Assistant (pre-consent `gcs=G100`, accept `gcs=G111`) y Pixel Helper (pixel solo post-consent).
+- [ ] Ejecutar `GOOGLE_APPLICATION_CREDENTIALS=../prometheus-website/.gtm-sa-key.json python3 tools/gtm_consent_update_trigger.py --apply --publish` (dry-run por default). Añade el trigger `consent_update` a LinkedIn Insight y HubSpot en GTM para que carguen en la misma visita en la que el usuario acepta el banner — hoy solo disparan en "All Pages" y GTM no re-evalúa tags consent-blocked a mitad de visita. Inerte hasta que PR #18 esté en producción; puede ejecutarse antes o después del deploy.
+- [ ] Meta Business Manager: click "Verify domain" en `lumenapp.ai` y asignar el pixel `982145840992357` al dominio verificado.
+- [ ] Revisión legal externa de los borradores V1 de `/legal/*`.
+- [ ] GTM tag 42 `LinkedIn — Lead` tiene `conversion_id: 99999999` placeholder — reemplazar con el conversion ID real de LinkedIn Campaign Manager.

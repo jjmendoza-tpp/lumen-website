@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Urbanist } from "next/font/google";
 import Script from "next/script";
+import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 
 const SITE_URL = "https://lumenapp.ai";
@@ -122,6 +123,47 @@ export default function RootLayout({
   return (
     <html lang="es" className={urbanist.variable}>
       <head>
+        {/* Consent Mode v2 — default-deny + replay. DEBE ejecutarse ANTES del
+            loader de GTM (script plano para garantizar orden de ejecución en
+            el parse del HTML). wait_for_update: 500 da margen para que el
+            replay desde localStorage ocurra antes de que los tags evalúen
+            consent. NO mover ni convertir a next/script. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ window.dataLayer.push(arguments); }
+  window.gtag = window.gtag || gtag;
+
+  gtag('consent', 'default', {
+    ad_storage:              'denied',
+    ad_user_data:            'denied',
+    ad_personalization:      'denied',
+    personalization_storage: 'denied',
+    analytics_storage:       'denied',
+    functionality_storage:   'granted',
+    security_storage:        'granted',
+    wait_for_update: 500
+  });
+
+  try {
+    var raw = localStorage.getItem('lumen:consent:v1');
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (d && d.v === 1) {
+        gtag('consent', 'update', {
+          analytics_storage:       d.analytics ? 'granted' : 'denied',
+          ad_storage:              d.marketing ? 'granted' : 'denied',
+          ad_user_data:            d.marketing ? 'granted' : 'denied',
+          ad_personalization:      d.marketing ? 'granted' : 'denied',
+          personalization_storage: d.marketing ? 'granted' : 'denied'
+        });
+      }
+    }
+  } catch (e) {}
+})();`,
+          }}
+        />
         <meta
           name="facebook-domain-verification"
           content="q9pbenuvjxiskf2v7ossys0vg8ndws"
@@ -147,74 +189,93 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
         </Script>
-        {/* LinkedIn Insight Tag — instalado verbatim según el manual oficial.
-            Se renderiza como <script> plano en <head> (no envuelto por
-            next/script) para garantizar que getElementsByTagName("script")[0]
-            tenga un parentNode válido al ejecutarse el IIFE. */}
+        {/* Loaders consent-gated (Consent Mode v2) — LinkedIn Insight y Meta
+            Pixel son scripts sin consent built-in, así que se inyectan SOLO
+            con consentimiento de marketing; Chatwoot (cookies + WebSocket)
+            requiere analítica + marketing, igual que en prometheus-website.
+            Los snippets internos son los oficiales verbatim de cada vendor.
+            Script plano en <head> (no next/script) para garantizar que
+            getElementsByTagName("script")[0] tenga un parentNode válido al
+            ejecutarse cada IIFE. Chatwoot: el sdk.js en /packs/js/sdk.js
+            sigue pendiente de fix server-side en app.innovacion.ai. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `_linkedin_partner_id = "${LINKEDIN_PARTNER_ID}";
-window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-window._linkedin_data_partner_ids.push(_linkedin_partner_id);`,
+            __html: `(function () {
+  var loadedMarketing = false;
+  var loadedChatwoot = false;
+
+  function loadMarketing() {
+    if (loadedMarketing) return;
+    loadedMarketing = true;
+
+    window._linkedin_partner_id = "${LINKEDIN_PARTNER_ID}";
+    window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+    window._linkedin_data_partner_ids.push(window._linkedin_partner_id);
+    (function(l) {
+    if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+    window.lintrk.q=[]}
+    var s = document.getElementsByTagName("script")[0];
+    var b = document.createElement("script");
+    b.type = "text/javascript";b.async = true;
+    b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+    s.parentNode.insertBefore(b, s);})(window.lintrk);
+
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    window.fbq('init', '${META_PIXEL_ID}');
+    window.fbq('track', 'PageView');
+  }
+
+  function loadChatwoot() {
+    if (loadedChatwoot) return;
+    loadedChatwoot = true;
+
+    window.chatwootSettings = {
+      position: "right",
+      type: "expanded_bubble",
+      launcherTitle: "Habla con Lumen"
+    };
+    (function(d,t) {
+      var BASE_URL="${CHATWOOT_BASE_URL}";
+      var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src=BASE_URL+"/packs/js/sdk.js";
+      g.async=true;
+      s.parentNode.insertBefore(g,s);
+      g.onload=function(){
+        window.chatwootSDK.run({
+          websiteToken: "${CHATWOOT_WEBSITE_TOKEN}",
+          baseUrl: BASE_URL
+        });
+      };
+    })(document,"script");
+  }
+
+  function apply(analytics, marketing) {
+    if (marketing) loadMarketing();
+    if (analytics && marketing) loadChatwoot();
+  }
+
+  try {
+    var raw = localStorage.getItem('lumen:consent:v1');
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (d && d.v === 1) apply(!!d.analytics, !!d.marketing);
+    }
+  } catch (e) {}
+
+  window.addEventListener('lumen:consent-updated', function (e) {
+    var det = (e && e.detail) || {};
+    apply(!!det.analytics, !!det.marketing);
+  });
+})();`,
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(l) {
-if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
-window.lintrk.q=[]}
-var s = document.getElementsByTagName("script")[0];
-var b = document.createElement("script");
-b.type = "text/javascript";b.async = true;
-b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
-s.parentNode.insertBefore(b, s);})(window.lintrk);`,
-          }}
-        />
-        {/* Meta Pixel — instalado verbatim según el código oficial de Events
-            Manager. Se renderiza como <script> plano en <head> (mismo patrón
-            que LinkedIn) para evitar que next/script altere el orden de
-            ejecución del IIFE. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
-fbq('track', 'PageView');`,
-          }}
-        />
-        <Script id="chatwoot-settings" strategy="afterInteractive">
-          {`window.chatwootSettings = {
-  position: "right",
-  type: "expanded_bubble",
-  launcherTitle: "Habla con Lumen"
-};`}
-        </Script>
-        <Script id="chatwoot-widget" strategy="afterInteractive">
-          {`(function(d,t) {
-  var BASE_URL="${CHATWOOT_BASE_URL}";
-  var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-  // Chatwoot admin UI recommends /packs/js/sdk.js. The Vite migration of
-  // the instance at app.innovacion.ai currently returns 404 for this path
-  // and /app/sdk.js serves an empty HTML body — pending IT fix on the
-  // Chatwoot server-side asset pipeline. Once resolved the widget will
-  // load without any change to this file.
-  g.src=BASE_URL+"/packs/js/sdk.js";
-  g.async=true;
-  s.parentNode.insertBefore(g,s);
-  g.onload=function(){
-    window.chatwootSDK.run({
-      websiteToken: "${CHATWOOT_WEBSITE_TOKEN}",
-      baseUrl: BASE_URL
-    });
-  };
-})(document,"script");`}
-        </Script>
       </head>
       <body className="bg-transparent font-[family-name:var(--font-urbanist)] text-[#0d0d1a] antialiased">
         <noscript>
@@ -225,24 +286,9 @@ fbq('track', 'PageView');`,
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            alt=""
-            src={`https://px.ads.linkedin.com/collect/?pid=${LINKEDIN_PARTNER_ID}&fmt=gif`}
-          />
-        </noscript>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            alt=""
-            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-          />
-        </noscript>
+        {/* Los beacons <noscript> de Meta y LinkedIn se removieron: disparan
+            incondicionalmente y no pueden respetar Consent Mode v2. El iframe
+            de GTM se mantiene porque GTM sí evalúa consent server-side. */}
 
         <a
           href="#main-content"
@@ -252,6 +298,7 @@ fbq('track', 'PageView');`,
         </a>
 
         <main id="main-content">{children}</main>
+        <CookieBanner />
       </body>
     </html>
   );

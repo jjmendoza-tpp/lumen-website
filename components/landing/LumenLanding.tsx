@@ -4643,6 +4643,30 @@ const LandingInner = () => {
               El Motor Conversacional · Prometheus
             </span>
           </div>
+          <nav
+            aria-label="Legal"
+            style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}
+          >
+            {[
+              { label: "Términos de uso", href: "/legal/terminos" },
+              { label: "Privacidad", href: "/legal/privacidad" },
+              { label: "Cookies", href: "/legal/cookies" },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                style={{
+                  fontFamily: "'Urbanist', sans-serif",
+                  fontWeight: 400,
+                  fontSize: "13px",
+                  color: footerText,
+                  textDecoration: "none",
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
           <p
             style={{
               fontFamily: "'Urbanist', sans-serif",

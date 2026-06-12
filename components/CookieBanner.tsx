@@ -79,10 +79,26 @@ export default function CookieBanner() {
   const [marketing, setMarketing] = useState(true);
 
   useEffect(() => {
+    let t: number | undefined;
     if (!readDecision()) {
-      const t = window.setTimeout(() => setVisible(true), 1200);
-      return () => window.clearTimeout(t);
+      t = window.setTimeout(() => setVisible(true), 1200);
     }
+    // Reapertura desde /legal/cookies ("Cambiar mis preferencias"):
+    // prefill con la decisión guardada y abrir directo en modo granular.
+    const reopen = () => {
+      const d = readDecision();
+      if (d) {
+        setAnalytics(d.analytics);
+        setMarketing(d.marketing);
+      }
+      setCustomizing(true);
+      setVisible(true);
+    };
+    window.addEventListener("lumen:cookie-prefs-open", reopen);
+    return () => {
+      if (t) window.clearTimeout(t);
+      window.removeEventListener("lumen:cookie-prefs-open", reopen);
+    };
   }, []);
 
   if (!visible) return null;
@@ -105,7 +121,13 @@ export default function CookieBanner() {
       <p className="mt-1 text-sm leading-relaxed text-[#0d0d1a]/70">
         Usamos cookies para medir el uso del sitio (analítica) y mejorar
         nuestras campañas (marketing). Puedes aceptar todas, rechazarlas o
-        elegir por categoría. Las cookies esenciales siempre están activas.
+        elegir por categoría. Las cookies esenciales siempre están activas.{" "}
+        <a
+          href="/legal/cookies"
+          className="font-medium text-[#6801FF] underline-offset-2 hover:underline"
+        >
+          Más detalle
+        </a>
       </p>
 
       {customizing && (

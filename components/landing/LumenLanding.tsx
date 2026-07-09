@@ -12,6 +12,7 @@ import {
 } from "react";
 import { LumenDemoModal } from "@/components/landing/LumenDemoModal";
 import { LumenHubSpotForm } from "@/components/landing/LumenHubSpotForm";
+import { trackEvent } from "@/lib/analytics";
 import {
   MessageCircle,
   Mic,
@@ -48,14 +49,9 @@ const LOGO_DARK = "/logos/lumen-logo-dark.png";
 const LOGO_LIGHT = "/logos/lumen-logo-white.png";
 const THEME_STORAGE_KEY = "lumen-theme";
 
-function trackEvent(event: string, payload: Record<string, unknown> = {}) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, ...payload });
-}
+// trackEvent moved to @/lib/analytics — it now also forwards events to GA4
+// via gtag (dataLayer-only pushes never reached GA4 because the GTM
+// container has no GA4 event tags configured).
 
 function useBreakpoint() {
   const [width, setWidth] = useState(1200);

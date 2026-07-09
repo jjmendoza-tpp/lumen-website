@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import { trackLead } from "@/lib/analytics";
+
 declare global {
   interface Window {
     dataLayer: Array<Record<string, unknown>>;
@@ -419,6 +421,9 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
       ) {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: "hubspot_form_submit", formId: FORM_ID });
+        // GA4 lead conversion — mark `generate_lead` as key event in GA4
+        // and import it to Google Ads. Deduplicated inside trackLead.
+        trackLead("hubspot_form", { form_id: FORM_ID });
       }
     };
     window.addEventListener("message", onMessage);

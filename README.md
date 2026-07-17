@@ -1,3 +1,5 @@
+> ⚠️ **CONGELADO PARA FEATURES — 2026-07-17 (Homologación F1)**: este repo es la fuente del sitio LIVE en Netlify pero queda **read-only para features** (solo hotfixes urgentes) hasta el cutover. El canónico de Lumen es Azure DevOps `easygosanet/Prometheus-Clients/_git/lumen-website` (rama base `s3-rev-astro-rebuild`, rebuild Astro en F2). Los PRs abiertos #18/#19 NO se mergean aquí: son requisitos de paridad del rebuild. Contexto: `Prometheus/02_COMERCIAL/web/HOMOLOGACION_INVENTARIO.md`. Este repo se archiva en F5 post-cutover.
+
 # Lumen Landing
 
 Landing page productiva de Lumen publicada en `https://lumenapp.ai`.

@@ -389,29 +389,50 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
   }, []);
 
   useEffect(() => {
-    if (formCreated.current) {
-      return;
-    }
-
-    formCreated.current = true;
-
-    // HubSpot embed v2 auto-renders any `.hs-form-frame` it finds on DOM
-    // mount. No manual `hbspt.forms.create(...)` call — required for
-    // forms with reCAPTCHA enabled.
-    const existing = document.querySelector(`script[src="${SCRIPT_SRC}"]`);
-    if (existing) {
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = SCRIPT_SRC;
-    script.defer = true;
-    script.onerror = () => {
-      console.error("Failed to load HubSpot form script");
+    // ⚠️ EL BRIDGE DE EVENTOS SE REGISTRA PRIMERO, ANTES DE CUALQUIER GUARD.
+    // Bug 2026-07-28: los listeners se registraban DESPUÉS del early-return de
+    // `formCreated` y del de "el script ya existe en el head". En cualquier
+    // remount (soft-nav a /en y volver) la instancia nueva veía el script ya
+    // presente, hacía `return`, y el tracking quedaba muerto para esa visita.
+    //
+    // ⚠️ CONTRATO DE EVENTOS (root cause, ver mkt_learnings):
+    // `js.hsforms.net/forms/embed/<portalId>.js` (el embed NUEVO, el que
+    // auto-renderiza `.hs-form-frame` y es obligatorio con reCAPTCHA) **NUNCA**
+    // emite el postMessage legacy `{type:'hsFormCallback',
+    // eventName:'onFormSubmitted'}` — verificado descargando el bundle: cero
+    // ocurrencias de `hsFormCallback`. Habla con su iframe por MessageChannel y
+    // expone al padre **CustomEvents del DOM**: `hs-form-event:on-submission:success`
+    // (bubbles, detail:{formId,instanceId}), `:on-ready` y `:on-submission:failed`.
+    // Escuchar sólo el mensaje legacy dejó 13 submits reales (6 de PAID_SEARCH)
+    // entre 2026-07-09 y 07-28 sin un solo `generate_lead` en GA4.
+    let fired = false;
+    const onSubmitted = (formId?: string) => {
+      if (fired) return; // un submit = un juego de eventos
+      fired = true;
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "hubspot_form_submit",
+        formId: formId || FORM_ID,
+      });
+      // GA4 lead conversion vía gtag — `generate_lead` es key event en GA4 e
+      // importado a Google Ads. Deduplicado dentro de trackLead.
+      // OJO: trackLead espeja el evento en dataLayer con su MISMO nombre; si el
+      // contenedor de GTM tiene tags GA4 escuchando `generate_lead`, cada submit
+      // manda 3 pings (medido en vivo 2026-07-28: 3× en=generate_lead, sólo 1 con
+      // ep.lead_source) → infla conversiones 3× en Ads. Auditar GTM y contar los
+      // pings por RED en el burn test post-deploy (GA4 Realtime no muestra
+      // pings cookieless gcs=G100).
+      trackLead("hubspot_form", { form_id: formId || FORM_ID });
     };
-    document.head.appendChild(script);
 
-    // Bridge submit event from the embed iframe into dataLayer.
+    // Contrato REAL del embed nuevo. Burbujea → basta escuchar en document.
+    const onDomEvent = (event: Event) => {
+      const detail = (event as CustomEvent<{ formId?: string }>).detail;
+      onSubmitted(detail?.formId);
+    };
+    document.addEventListener("hs-form-event:on-submission:success", onDomEvent);
+
+    // Red de seguridad: contrato legacy (embeds viejos / editor en iframe).
     const onMessage = (event: MessageEvent) => {
       if (
         typeof event.data === "object" &&
@@ -419,15 +440,37 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
         (event.data as { type?: string }).type === "hsFormCallback" &&
         (event.data as { eventName?: string }).eventName === "onFormSubmitted"
       ) {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "hubspot_form_submit", formId: FORM_ID });
-        // GA4 lead conversion — mark `generate_lead` as key event in GA4
-        // and import it to Google Ads. Deduplicated inside trackLead.
-        trackLead("hubspot_form", { form_id: FORM_ID });
+        onSubmitted((event.data as { id?: string }).id);
       }
     };
     window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
+
+    const cleanup = () => {
+      document.removeEventListener(
+        "hs-form-event:on-submission:success",
+        onDomEvent,
+      );
+      window.removeEventListener("message", onMessage);
+    };
+
+    // Carga del script: idempotente y separada del bridge de eventos.
+    // HubSpot embed v2 auto-renderiza cualquier `.hs-form-frame` que encuentre
+    // al montar el DOM. Sin `hbspt.forms.create(...)` manual — requerido para
+    // formularios con reCAPTCHA.
+    if (!formCreated.current) {
+      formCreated.current = true;
+      if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
+        const script = document.createElement("script");
+        script.src = SCRIPT_SRC;
+        script.defer = true;
+        script.onerror = () => {
+          console.error("Failed to load HubSpot form script");
+        };
+        document.head.appendChild(script);
+      }
+    }
+
+    return cleanup;
   }, []);
 
   useEffect(() => {

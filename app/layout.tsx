@@ -10,7 +10,8 @@ const DEFAULT_DESCRIPTION_ES =
 const DEFAULT_DESCRIPTION_EN =
   "Lumen AI centralizes WhatsApp, voice, email and social channels to reply, qualify leads and route conversations to the right agent in seconds.";
 const GTM_ID = "GTM-KZNM7JNM";
-const GA_ID = "G-BWZW45MGRG";
+// GA4 measurement ID G-BWZW45MGRG: configurado DENTRO de GTM (no aquí) — ver
+// comentario en <head> sobre el multi-disparo de generate_lead.
 const LINKEDIN_PARTNER_ID = "9006578";
 const META_PIXEL_ID = "982145840992357";
 const CHATWOOT_BASE_URL =
@@ -137,16 +138,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${GTM_ID}');`}
         </Script>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga4-config" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
-        </Script>
+        {/* GA4 se carga ÚNICAMENTE vía GTM (tag "Google Tag" G-BWZW45MGRG en
+            GTM-KZNM7JNM, All Pages). El loader gtag.js directo que vivía aquí
+            duplicaba la config de GA4 (dos instancias del mismo measurement ID)
+            y era 1 de los 3 emisores del multi-disparo de `generate_lead`
+            (3-4× por submit, medido 2026-07-28/30 — Review 2 del marketing
+            system). No re-agregar: los eventos van por dataLayer.push y los
+            consume el contenedor. */}
         {/* LinkedIn Insight Tag — instalado verbatim según el manual oficial.
             Se renderiza como <script> plano en <head> (no envuelto por
             next/script) para garantizar que getElementsByTagName("script")[0]

@@ -1,21 +1,21 @@
 // Analytics helpers for lead tracking.
 //
-// The site loads GA4 (gtag, G-BWZW45MGRG) and GTM (GTM-KZNM7JNM) in
-// app/layout.tsx. GTM's container has no GA4 event tags configured, so
-// plain `dataLayer.push({event: ...})` calls never reach GA4. These
-// helpers send events through gtag directly (which GA4 always sees) AND
-// mirror them as plain dataLayer pushes (so GTM triggers can also use
-// them if configured later).
+// SINGLE SOURCE OF TRUTH: dataLayer → GTM (GTM-KZNM7JNM). El contenedor tiene
+// desde Sprint 3 el tag "Google Tag" (G-BWZW45MGRG, All Pages) + tags GA4 de
+// evento (`generate_lead`, `hubspot_form_submit`, …) + píxeles de Meta. Estos
+// helpers SOLO hacen `dataLayer.push({event: ...})`; el contenedor decide qué
+// destinos reciben cada evento.
 //
-// Consent: gtag events are natively subject to Google Consent Mode — if a
-// consent banner later sets `analytics_storage: denied` via
-// gtag('consent', ...), GA4 handles these events per the consent state.
-// Nothing here bypasses or overrides consent.
+// ⚠️ Historia (Review 2 marketing system, 2026-08-08): la versión anterior
+// además llamaba `gtag('event', …)` directo, y layout.tsx cargaba gtag.js con
+// su propia config del MISMO measurement ID. Resultado: cada submit mandaba
+// `generate_lead` 3-4× a GA4 (gtag directo + config duplicada + tag GTM sobre
+// el espejo), inflando la conversión importada en Google Ads. NO reintroducir
+// gtag directo mientras GTM tenga tags GA4 para estos eventos.
 
 declare global {
   interface Window {
     dataLayer: Array<Record<string, unknown>>;
-    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -23,8 +23,9 @@ declare global {
 const firedLeadSources = new Set<string>();
 
 /**
- * Send a GA4 event via gtag and mirror it into the dataLayer for GTM.
- * Safe to call on the server (no-op).
+ * Push one event into the dataLayer; GTM fans it out (GA4, píxeles, etc.).
+ * Exactly ONE push per call — never also gtag() — so one submit = one ping
+ * per destination. Safe to call on the server (no-op).
  */
 export function trackEvent(
   event: string,
@@ -35,15 +36,6 @@ export function trackEvent(
   }
 
   window.dataLayer = window.dataLayer || [];
-
-  // GA4 direct — gtag is defined globally by the inline script in
-  // app/layout.tsx. Guard anyway (ad blockers, script failures).
-  if (typeof window.gtag === "function") {
-    window.gtag("event", event, payload);
-  }
-
-  // GTM mirror — plain-object pushes are ignored by gtag/GA4 (which only
-  // reads `arguments`-style pushes), so this never double-counts in GA4.
   window.dataLayer.push({ event, ...payload });
 }
 

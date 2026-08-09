@@ -414,14 +414,11 @@ export function LumenHubSpotForm({ isDark, isMobile, isTablet }: LumenHubSpotFor
         event: "hubspot_form_submit",
         formId: formId || FORM_ID,
       });
-      // GA4 lead conversion vía gtag — `generate_lead` es key event en GA4 e
-      // importado a Google Ads. Deduplicado dentro de trackLead.
-      // OJO: trackLead espeja el evento en dataLayer con su MISMO nombre; si el
-      // contenedor de GTM tiene tags GA4 escuchando `generate_lead`, cada submit
-      // manda 3 pings (medido en vivo 2026-07-28: 3× en=generate_lead, sólo 1 con
-      // ep.lead_source) → infla conversiones 3× en Ads. Auditar GTM y contar los
-      // pings por RED en el burn test post-deploy (GA4 Realtime no muestra
-      // pings cookieless gcs=G100).
+      // GA4 lead conversion — `generate_lead` es key event en GA4 e importado
+      // a Google Ads. Deduplicado dentro de trackLead, y desde 2026-08-08
+      // trackLead hace UN solo dataLayer.push (GTM = única vía a GA4): el
+      // multi-disparo 3-4× medido el 07-28/30 era gtag directo + config GA4
+      // duplicada en layout.tsx + tag GTM, y ambos emisores extra se quitaron.
       trackLead("hubspot_form", { form_id: formId || FORM_ID });
     };
 
